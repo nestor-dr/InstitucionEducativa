@@ -14,7 +14,7 @@ router.delete('/:id', borrarCurso)
 //Obtiene todos los cursos existentes
 async function obtenerTodosCursos(req, res, next) {
     try {
-      const cursos = await Curso.find().populate('materia')
+      const cursos = await Curso.find().populate('materias').populate('anio')
       res.send(cursos)
     } catch (err) {
       next(err)
@@ -30,7 +30,7 @@ async function obtenerCursoPorId(req, res, next) {
     }
   
     try {
-      const curso = await Curso.findById(req.params.id).populate('materia')
+      const curso = await Curso.findById(req.params.id).populate('materias').populate('anio')
   
       if (!curso || curso.length == 0) {
         res.status(404).send('curso no encontrado')

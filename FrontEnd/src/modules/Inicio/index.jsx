@@ -1,14 +1,15 @@
+import miImagen from '../../images/Fondo 6.png';
 
-
- 
-
-
-function Inicio() {  
-  return (
-    <>
-      <h1>Hola clase de Programación III</h1>
-    </>
-  )
+function Inicio() {
+  return(
+    <div>
+      <img 
+      src={miImagen}
+      alt="Descripción de la imagen"
+      style={{ maxWidth: '100%', height: '50vh', objectFit: 'contain' }}
+      />
+    </div>
+  );
 }
 
 export default Inicio

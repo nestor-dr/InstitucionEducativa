@@ -2,13 +2,14 @@ const express = require('express')
 
 const Alumno = require('../schemas/alumno')
 const Curso = require('../schemas/curso')
+const { ObjectId } = require('mongodb')
 
 const router = express.Router()
 
 router.get('/', obtenerTodosAlumnos)
 router.get('/:id', obtenerAlumnoPorId)
 router.post('/', crearAlumno)
-router.put('/:id', actualizarAlumno)
+router.put('/', actualizarAlumno)
 router.delete('/:id', borrarAlumno)
 
 //Obtiene todos los alumnos existentes
@@ -49,9 +50,16 @@ async function crearAlumno(req, res, next) {
   const alumno = req.body
 
   try {
+    console.log(alumno.nroLegajo)  
+    const alumnoExistente = await Alumno.findOne({ nroLegajo: alumno.nroLegajo});
+    console.log('despues de la funcion')
+    console.log(alumnoExistente)
     const curso = await Curso.findOne({ _id: alumno.curso })
     if (!curso) {
       res.status(404).send('Curso no encontrado')
+    }
+    if (alumnoExistente) {
+      return res.status(400).send('El número de legajo ya existe');
     }
 
     const alumnoCreado = await Alumno.create({ ...alumno, curso: curso._id })
@@ -64,27 +72,27 @@ async function crearAlumno(req, res, next) {
 
 // Actualizamos un alumno
 async function actualizarAlumno(req, res, next) {
-  if (!req.params.id) {
-    return res.status(404).send('Parametro Id no encontrado')
-  }
-
   try {
-    const alumnoParaActualizar = await Alumno.findById(req.params.id)
+    const alumnoParaActualizar = await Alumno.findOne({nroLegajo: req.body.nroLegajo})
 
     if (!alumnoParaActualizar) {
       req.logger.error('Alumno no encontrado')
       return res.status(404).send('Alumno no encontrado')
     }
-
-    if (req.body.curso) {
-      const nuevoCurso = await Curso.findById(req.body.curso)
-
+    console.log(alumnoParaActualizar.curso)
+    console.log(req.body.curso)
+    let nuevoCurso = null
+    if (ObjectId.isValid(req.body.curso)) {
+      nuevoCurso = await Curso.findById(req.body.curso)
+    }else if(typeof req.body.curso === 'string'){
+      nuevoCurso = await Curso.findOne({nombre: req.body.curso})
+    }
       if (!nuevoCurso) {
-        req.logger.verbose('Nuevo curso no encontrado. Enviando 400 al cliente')
+        req.logger.error('Nuevo curso no encontrado. Enviando 400 al cliente')
         return res.status(400).end()
       }
       req.body.curso = nuevoCurso._id
-    }
+    
 
     // Esto va retornar el estado previo
     await alumnoParaActualizar.updateOne(req.body)
@@ -97,23 +105,23 @@ async function actualizarAlumno(req, res, next) {
 
 //Borramos un alumno
 async function borrarAlumno(req, res, next) {
-
+  console.log(req.params)
   if (!req.params.id) {
-    res.status(500).send('El parametro Id no esta definido')
+    res.status(500).send('El parametro Id no esta definido');
   }
 
   try {
-    const alumno = await Alumno.findById(req.params.id)
-
+    const alumno = await Alumno.findById(req.params.id);
+    console.log(alumno)
     if (!alumno) {
-      res.status(404).send('Alumno no encontrado')
+      res.status(404).send('Alumno no encontrado');
     }
 
-    await Alumno.deleteOne({ _id: alumno._id })
+    await Alumno.deleteOne({ _id: alumno._id });
 
-    res.send(`Alumno Borrado :  ${req.params.id}`)
+    res.send(`Alumno Borrado :  ${req.params.id}`);
   } catch (err) {
-    next(err)
+    next(err);
   }
 }
 

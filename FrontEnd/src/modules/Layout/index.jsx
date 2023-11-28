@@ -1,104 +1,112 @@
-import { useState } from 'react'
-import { UserOutlined } from '@ant-design/icons';
-import { Avatar, Space } from 'antd';
+import { useState } from 'react';
 import { Outlet, Link } from 'react-router-dom'
+import miImagen from '../../images/Fondo 6.png';
 import {
   HomeOutlined,
-  DownOutlined
-} from '@ant-design/icons'
-import { Layout, Menu, theme, Dropdown } from 'antd'
+  TeamOutlined,
+  SolutionOutlined,
+  UserAddOutlined,
+  UserSwitchOutlined,
+  ProfileOutlined,
+  ProjectOutlined,
+  ScheduleOutlined,
+  ReconciliationOutlined,
+  ReadOutlined,
+  FileSearchOutlined,
+  FileAddOutlined,
+  DownOutlined,
+  UserOutlined
+} from '@ant-design/icons';
 
-const {Header, Content, Footer, Sider } = Layout
-
-const headerStyle = {
-  textAlign: 'center',
-  color: '#fff',
-  height: 64,
-  paddingInline: 50,
-  lineHeight: '64px',
-  backgroundColor: '#7dbcea',
-};
-
+import { Layout, Menu, Avatar, Dropdown, Button, Space} from 'antd';
+const { Header, Content, Footer, Sider } = Layout;
 function getItem(label, key, icon, children) {
   return {
     key,
     icon,
     children,
     label,
-  }
+  };
 }
 
-const items = [
-    getItem(<Link to="/Inicio"> Inicio </Link>, '1', <HomeOutlined />),
-    getItem(<Link to="/Alumnos"> Alumnos </Link>, '2', <HomeOutlined />),
-    getItem(<Link to="/Cursos"> Cursos </Link>, '3', <HomeOutlined />),
-    getItem(<Link to="/Boletines"> Boletines </Link>, '3', <HomeOutlined />),  
-]
+const usuario = JSON.parse(localStorage.getItem('usuario'));
+const nombreUsuario = usuario && usuario.usuario ? usuario.usuario.nombre : '';
 
+const items = [
+  getItem(<Link to="/Inicio"> Inicio </Link>, '1', <HomeOutlined />),
+  getItem('Alumnos', '2', <TeamOutlined />, 
+  [
+    getItem(<Link to="/Alumnos/Listado"> Listado de Alumnos </Link>, '3', <SolutionOutlined />),
+    getItem(<Link to="/Alumnos/Crear"> Alta de Alumno </Link>, '4', <UserAddOutlined />),
+    getItem(<Link to="/Alumnos/Modificar">Modificar Alumno </Link>, '5', <UserSwitchOutlined />),
+  ]
+  ),
+  getItem('Cursos', '6', <ProfileOutlined />, [
+    getItem('Listado de Cursos', '7', <ProjectOutlined />), 
+    getItem('Alta de Curso', '8', <ScheduleOutlined />),
+    getItem('Asociar Curso', '9', <ReconciliationOutlined />),
+  ]),
+  getItem('Boletines', '10', <ReadOutlined />,[
+    getItem('Buscar Boletin', '11', <FileSearchOutlined />), 
+    getItem('Agregar Boletin', '12', <FileAddOutlined />),
+  ]),
+];
+
+const CerrarSesion = () => {
+  localStorage.clear();
+  window.location.href= '/';
+};
 
 const App = () => {
-  const [collapsed, setCollapsed] = useState(false)
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken()
-
-  const handleLogout = () => {
-    sessionStorage.clear();
-    window.location.href= '/';
-  };
-
+  const [collapsed, setCollapsed] = useState(false);
+  const menuProps = (
+    <Menu theme="dark">
+      <Menu.Item key="menu-item-1">Datos Personales</Menu.Item>
+      <Menu.Item key="logout" onClick={CerrarSesion}>Cerrar Sesión</Menu.Item>
+    </Menu>
+  );
   return (
-    <Layout
-      style={{
-        minHeight: '100vh',
-      }}
-    >
-  
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={(value) => setCollapsed(value)}
-      >
+    <Layout style={{ minHeight: '100vh', }}>
+      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
         <div className="demo-logo-vertical" />
-        <Menu
-          theme="dark"
-          defaultSelectedKeys={['1']}
-          mode="inline"
-          items={items}
-        ></Menu>
+        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
       </Sider>
-      <Layout style={{ width: '100%' }}>
-      <Header style={headerStyle}>
-        <Space ddirection="horizontal" style={{ width: '100%', justifyContent: 'space-between' }}>
-          <Space wrap size={16} >
-          <Dropdown
-    overlay={
-      <Menu>
-        <Menu.Item key="logout" onClick={handleLogout}>
-          Cerrar sesión
-        </Menu.Item>
-      </Menu>
-    }
-    trigger={['click']}
-  >
-    <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-      {/* <span style={{ color: 'white' }}>Hola {nombreUsuario}</span> */}
-      <DownOutlined style={{ marginLeft: '8px' }} />
-    </div>
-  </Dropdown>
-  <Avatar shape="square" size="large" icon={<UserOutlined />} />
-    </Space>
-        </Space>
-      </Header>
+      <Layout>
+        <Header
+          style={{
+            padding: 0,
+            background: '#001d66',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', marginLeft: '1500px' }}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <Dropdown overlay={menuProps} trigger={['click']}>
+                <Button type="primary" size='default' style={{ backgroundColor: '#003eb3', borderColor: '#003eb3' }}>
+                  <Space>
+                    Hola{nombreUsuario} <DownOutlined />
+                  </Space>
+                </Button>
+              </Dropdown>
+            </div>
+            <div style={{ marginLeft: '8px' }} />
+            <Avatar style={{ backgroundColor: '#ffa39e' }} icon={<UserOutlined />} />
+          </div>
+        </Header>
         <Content
           style={{
             margin: '20px 16px',
+            background: `url(${miImagen})`,
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'center',
           }}
         >
           <div
             style={{
               height: '100%',
-              background: colorBgContainer,
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -108,15 +116,12 @@ const App = () => {
             <Outlet />
           </div>
         </Content>
-        <Footer
-          style={{
-            textAlign: 'center',
-          }}
-        >
+        <Footer style={{ textAlign: 'center' }}>
           Ant Design ©2023 Created by Ant UED
         </Footer>
       </Layout>
     </Layout>
-  )
-}
-export default App
+  );
+};
+
+export default App;

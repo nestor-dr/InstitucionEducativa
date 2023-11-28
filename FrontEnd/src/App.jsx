@@ -2,6 +2,9 @@ import { Routes, Route, BrowserRouter } from 'react-router-dom'
 import Login from './modules/Login'
 import Layout from './modules/Layout'
 import Inicio from './modules/Inicio'
+import ListadoAlumno from './modules/ListadoAlumno'
+import CrearAlumno from './modules/CrearAlumno'
+import ModificarAlumno from './modules/ModificarAlumno'
 
 function App() {
 
@@ -10,23 +13,18 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
-
-             <Route element={<Layout />}>
+          <Route element={<Layout />}>
               <Route path="Inicio" element={<Inicio />} />
-              {/* <Route path="Prueba" element={<Prueba />} />
               <Route path="Alumnos">
-                <Route index element={<Alumnos />} />
-                <Route path="crear" element={<AlumnosCrear />} />
-                <Route path="editar" element={<AlumnosEditar />} />
-              </Route>
-                <Route path="Cursos" element={<Cursos />} />
-                <Route path="*" element={<NotFound />} />
+              <Route path="Listado" element={<ListadoAlumno />} />
+              <Route path="Crear" element={<CrearAlumno />} />
+              <Route path="Modificar" element={<ModificarAlumno />} />
             </Route>
-            <Route path="Prueba" element={<Prueba />} />  */}
-            </Route>
+          </Route>         
         </Routes> 
       </BrowserRouter> 
     </div>
+
   )
 }
 

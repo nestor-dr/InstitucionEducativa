@@ -6,12 +6,12 @@ const { Schema } = mongoose
 const { ObjectId } = Schema.Types
 const emailValidator = validate({ validator: 'isEmail' })
 
-const usuarioSchema = new Schema({
-  rol: { type: ObjectId, ref: 'Roles', required: true},  
-  nombre: { type: String, required: true, lowercase: true, trim: true},
+const usuarioSchema = new Schema({  
+  nombre:   { type: String, required: true, lowercase: true, trim: true},
   apellido: { type: String, required: true, lowercase: true, trim: true},
-  email: { type: String, required: true, unique: true, lowercase: true, trim: true, validate: emailValidator},
+  email:    { type: String, required: true, unique: true, lowercase: true, trim: true, validate: emailValidator},
   password: { type: String, required: true, select: false},
+  rol:      { type: ObjectId, ref: 'Roles', required: true}
 })
 
 usuarioSchema.method('checkPassword', async function checkPassword(potentialPassword) {

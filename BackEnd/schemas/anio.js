@@ -4,8 +4,9 @@ const { Schema } = mongoose
 const { ObjectId } = Schema.Types
 
 const anioSchema = new Schema({
-    nombre: { type: String, required: true, lowercase: true, trim: true},
-    materia: { type: ObjectId, ref: 'Materia', required: true}
+    nombre:   { type: String, required: true, lowercase: true, trim: true },
+    cursos:   [{ type: ObjectId, ref: 'Curso' }],
+    materias: [{ type: ObjectId, ref: 'Materia' }]
 })
 
 const Anio = mongoose.model('Anio', anioSchema)
