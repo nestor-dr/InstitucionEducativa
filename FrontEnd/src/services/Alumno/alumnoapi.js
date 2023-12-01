@@ -6,19 +6,9 @@ alumnoService.crearAlumno = async (alumno) => {return await api.post('/alumnos',
 alumnoService.eliminarAlumno = async (alumnoId) => {return await api.delete(`/alumnos/${alumnoId}`)};
 alumnoService.actualizarAlumno = async (alumno) => {return await api.put('/alumnos', alumno)}
 alumnoService.obtenerAlumnos = async () => {return await api.get('/alumnos')};
-alumnoService.obtenerAlumno = async () => {return await api.get('/alumnos/:id')};
+alumnoService.obtenerAlumno = async (alumnoId) => {return await api.get(`/alumnos/${alumnoId}`)};
 
-alumnoService.obtenerLegajos = async () => {
-      const response = await api.get('/alumnos');
-      
-      if (!response) {
-        throw new Error('Error al obtener la lista de legajos');
-      }
-      const legajos = response.map(alumno => alumno.nroLegajo);
-      return legajos;
-  }
-
-alumnoService.obtenerAlumnoPorLegajo = async (Legajo) =>{
+alumnoService.obtenerAlumnoLegajo = async (Legajo) =>{
     const response = await api.get('/alumnos');
     console.log(response)
     if (!response) {

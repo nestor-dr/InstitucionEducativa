@@ -1,8 +1,12 @@
 import { Form, Input, Select, Button, Row, Col, Typography, InputNumber, Alert  } from 'antd';
+
 import { useState, useEffect } from 'react';
+
 import { UserAddOutlined } from '@ant-design/icons';
+
 import alumnoService from '../../services/Alumno/alumnoapi';
 import cursoService from '../../services/Curso/cursoapi';
+
 import miImagen from '../../images/Fondo 6.png';
 
 const { Title, Text } = Typography;
@@ -19,24 +23,23 @@ export default function CrearAlumno() {
             cursoService.obtenerCursos().then(res => {setCursos(res);}); 
         };
         selectCursos();
-      }, []);
+    }, []);
 
     const onFinish = (values) => {
-        console.log('Valores del formulario:', values);
-    
+
         alumnoService.crearAlumno(values).then((res) => {
-            console.log('Alumno creado exitosamente:', res);
-            setSuccess('Alumno creado exitosamente.');
+        console.log('Alumno creado exitosamente:', res);
+        setSuccess('Alumno creado exitosamente.');
         
-            form.resetFields();
+        form.resetFields();
         
-            setTimeout(() => {
-                setSuccess(null);
-            }, 2000);
+        setTimeout(() => {
+            setSuccess(null);
+        }, 2000);
         }).catch((error) => {
             console.error('Error al crear alumno:', error);
             setError('Error al crear el Alumno. Nro de Legajo existente');
-      
+
             setTimeout(() => {
                 setError(null);
             }, 2000);
@@ -61,8 +64,8 @@ export default function CrearAlumno() {
         }}
     >
         <div style={{ position: 'absolute', top: 240, opacity: 0.1}}>
-        <img src={miImagen} alt="Descripción de la imagen" style={{ maxWidth: '100%' }} />
-      </div>
+            <img src={miImagen} alt="Descripción de la imagen" style={{ maxWidth: '100%' }} />
+        </div>
         <Title 
             level={2}
             style={{
@@ -79,6 +82,7 @@ export default function CrearAlumno() {
         <div style={{ marginBottom: '20px' }}>
             <UserAddOutlined style={{ fontSize: '50px', color: 'black' }} />
         </div>
+        
         {error && (
             <Alert
                 message="Error"

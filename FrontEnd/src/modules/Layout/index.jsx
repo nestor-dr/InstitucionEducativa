@@ -42,8 +42,8 @@ const items = [
   ]
   ),
   getItem('Cursos', '6', <ProfileOutlined />, [
-    getItem('Listado de Cursos', '7', <ProjectOutlined />), 
-    getItem('Alta de Curso', '8', <ScheduleOutlined />),
+    getItem(<Link to="/Cursos/Listado"> Listado de Curso </Link>, '7', <ProjectOutlined />), 
+    getItem(<Link to="/Cursos/Crear"> Alta de Curso </Link>, '8', <ScheduleOutlined />),
     getItem('Asociar Curso', '9', <ReconciliationOutlined />),
   ]),
   getItem('Boletines', '10', <ReadOutlined />,[

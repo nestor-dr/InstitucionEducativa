@@ -6,19 +6,20 @@ const { ObjectId } = mongodb
 const aniosIniciales = [
     {
       _id: new ObjectId('000000000000000000000000'),
-      nombre: 'Primer Anio',
+      nombre: '1° Primer Año',
+      materias: [ new ObjectId('000000000000000000000000'), new ObjectId('000000000000000000000001')],
       createdAt: new Date(),
       updatedAt: new Date(),
     },
     {
       _id: new ObjectId('000000000000000000000001'),
-      nombre: 'Segundo Anio',
+      nombre: '2° Segundo Año',
       createdAt: new Date(),
       updatedAt: new Date(),
     },
     {
       _id: new ObjectId('000000000000000000000002'),
-      nombre: 'Tercer Anio',
+      nombre: '3° Tercer Año',
       createdAt: new Date(),
       updatedAt: new Date(),
     }

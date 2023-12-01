@@ -2,6 +2,7 @@ const express = require('express')
 
 const Curso = require('../schemas/curso')
 const Materia = require('../schemas/materia')
+const Anio = require('../schemas/anio')
 
 const router = express.Router()
 
@@ -14,7 +15,8 @@ router.delete('/:id', borrarCurso)
 //Obtiene todos los cursos existentes
 async function obtenerTodosCursos(req, res, next) {
     try {
-      const cursos = await Curso.find().populate('materias').populate('anio')
+      const cursos = await Curso.find().populate('materias')
+      console.log(cursos)
       res.send(cursos)
     } catch (err) {
       next(err)
@@ -30,7 +32,7 @@ async function obtenerCursoPorId(req, res, next) {
     }
   
     try {
-      const curso = await Curso.findById(req.params.id).populate('materias').populate('anio')
+      const curso = await Curso.findById(req.params.id).populate('materias')
   
       if (!curso || curso.length == 0) {
         res.status(404).send('curso no encontrado')
@@ -44,17 +46,22 @@ async function obtenerCursoPorId(req, res, next) {
 
 // Creamos un curso a partir de los datos obtenidos
 async function crearCurso(req, res, next) {
-    console.log('Crear curso: ', req.body)
+    
   
     const curso = req.body
-  
+    console.log(curso)
     try {
-      const materia = await Materia.findOne({ name: curso.materia })
-      if (!materia) {
-        res.status(404).send('Materia no encontrado')
+      const anio = await Anio.findOne({ _id: curso.anio })
+      if (!anio) {
+        res.status(404).send('Año no encontrado')
       }
   
-      const cursoCreado = await Curso.create({ ...curso, materia: materia._id })
+      const materias = await Materia.find({ _id: { $in: curso.materias } });
+      if (!materias) {
+        res.status(404).send('Materias no encontrado')
+      }
+      
+      const cursoCreado = await Curso.create({ ...curso, anio: anio._id, materias: materias.map((materia) => materia._id) })
   
       res.send(cursoCreado)
     } catch (err) {

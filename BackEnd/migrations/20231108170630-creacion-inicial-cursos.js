@@ -8,6 +8,8 @@ const cursosIniciales = [
     {
         _id: new ObjectId('000000000000000000000000'),
         nombre: '1.601',
+        anio: new ObjectId('000000000000000000000000'),
+        materias: [ new ObjectId('000000000000000000000000'), new ObjectId('000000000000000000000001')],
         createdAt: new Date(),
         updatedAt: new Date(),
     },

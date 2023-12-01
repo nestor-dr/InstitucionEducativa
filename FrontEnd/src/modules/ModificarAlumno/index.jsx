@@ -10,8 +10,8 @@ const { Option } = Select;
 
 const ModificarAlumno = () => {
   const [cursos, setCursos] = useState([]);
-  const [legajos, setLegajos] = useState([]);
-  const [alumnoData, setAlumnoData] = useState(null);
+  const [alumnos, setAlumnos] = useState([]);
+  const [, setAlumnoData] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [form] = Form.useForm();
@@ -25,14 +25,13 @@ const ModificarAlumno = () => {
     // Obtener la lista de cursos
         cursoService.obtenerCursos().then(res => {setCursos(res);});
 
-    // Obtener la lista de legajos existentes
-        alumnoService.obtenerLegajos().then(res => {setLegajos(res);}); 
-        console.log(legajos)
+    // Obtener la lista de alumnos existentes
+        alumnoService.obtenerAlumnos().then(res => {setAlumnos(res);}); 
   };
 
-  const obtenerDatosAlumno = (legajo) => {
+  const obtenerDatosAlumno = (alumnoLegajo) => {
     // Obtener datos del alumno por legajo
-    alumnoService.obtenerAlumnoPorLegajo(legajo)
+    alumnoService.obtenerAlumnoLegajo(alumnoLegajo)
       .then((res) => {
         setAlumnoData(res);
         console.log(res); // Asegúrate de que los datos del alumno se impriman correctamente
@@ -42,6 +41,7 @@ const ModificarAlumno = () => {
           nombre: res.nombre,
           apellido: res.apellido,
           direccion: res.direccion,
+          nroLegajo: res.nroLegajo,
           edad: res.edad,
           curso: res.curso.nombre,
         });
@@ -140,9 +140,9 @@ const ModificarAlumno = () => {
       >
         <Form.Item label="Seleccionar Legajo" name="nroLegajo" rules={[{ required: true, message: 'Seleccione el legajo' }]}>
           <Select onChange={obtenerDatosAlumno}>
-            {legajos.map((legajo) => (
-              <Option key={legajo} value={legajo}>
-                {legajo}
+            {alumnos.map((alumno) => (
+              <Option key={alumno._id} value={alumno.nroLegajo}>
+                {alumno.nroLegajo}
               </Option>
             ))}
           </Select>
@@ -167,6 +167,7 @@ const ModificarAlumno = () => {
 
             {/* Segunda Columna */}
             <Col span={12}>
+
                 <Form.Item label="Dirección" name="direccion" rules={[{ required: true, message: 'Ingrese la dirección' }]}>
                     <Input />
                 </Form.Item>
