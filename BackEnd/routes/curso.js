@@ -9,13 +9,13 @@ const router = express.Router()
 router.get('/', obtenerTodosCursos)
 router.get('/:id', obtenerCursoPorId)
 router.post('/', crearCurso)
-router.put('/:id', actualizarCurso)
+router.put('/', actualizarCurso)
 router.delete('/:id', borrarCurso)
 
 //Obtiene todos los cursos existentes
 async function obtenerTodosCursos(req, res, next) {
     try {
-      const cursos = await Curso.find().populate('materias')
+      const cursos = await Curso.find().populate('materias').populate('anio')
       console.log(cursos)
       res.send(cursos)
     } catch (err) {
@@ -25,14 +25,13 @@ async function obtenerTodosCursos(req, res, next) {
 
 // Obtiene un curso por su Id
 async function obtenerCursoPorId(req, res, next) {
-    console.log('Obtener el curso por Id: ', req.params.id)
   
     if (!req.params.id) {
       res.status(500).send('El parametro Id no esta definido')
     }
   
     try {
-      const curso = await Curso.findById(req.params.id).populate('materias')
+      const curso = await Curso.findById(req.params.id).populate('materias').populate('anio')
   
       if (!curso || curso.length == 0) {
         res.status(404).send('curso no encontrado')
@@ -46,23 +45,15 @@ async function obtenerCursoPorId(req, res, next) {
 
 // Creamos un curso a partir de los datos obtenidos
 async function crearCurso(req, res, next) {
-    
   
     const curso = req.body
-    console.log(curso)
+
     try {
-      const anio = await Anio.findOne({ _id: curso.anio })
-      if (!anio) {
-        res.status(404).send('Año no encontrado')
-      }
+      const anio = (curso.anio == null) ? '' : await Anio.findOne({ _id: curso.anio });
   
-      const materias = await Materia.find({ _id: { $in: curso.materias } });
-      if (!materias) {
-        res.status(404).send('Materias no encontrado')
-      }
-      
-      const cursoCreado = await Curso.create({ ...curso, anio: anio._id, materias: materias.map((materia) => materia._id) })
-  
+      const materias = (curso.materias == null) ? '' : await Materia.find({ _id: { $in: curso.materias } });
+    
+      const cursoCreado = await Curso.create({...curso, anio: anio._id, ...(materias !== '') && { materias: materias.map((materia) => materia._id) }});   
       res.send(cursoCreado)
     } catch (err) {
       next(err)
@@ -71,28 +62,29 @@ async function crearCurso(req, res, next) {
 
 // Actualizamos un curso
 async function actualizarCurso(req, res, next) {
-    console.log('Actualizar usuario con Id: ', req.params.id)
-  
-    if (!req.params.id) {
-      return res.status(404).send('Parametro Id no encontrado')
-    }
 
     try {
-      const cursoParaActualizar = await Curso.findById(req.params.id)
-  
+      const cursoParaActualizar = await Curso.findOne({nombre: req.body.nombre})
       if (!cursoParaActualizar) {
         req.logger.error('Curso no encontrado')
         return res.status(404).send('Curso no encontrado')
       }
-  
-      if (req.body.materia) {
-        const nuevaMateria = await Materia.findById(req.body.materia)
-  
-        if (!nuevaMateria) {
-          req.logger.verbose('Nueva materia no encontrada. Enviando 400 al cliente')
+
+      if (req.body.anio) {
+        const nuevoAnio = await Anio.findById(req.body.anio)
+
+        if (!nuevoAnio) {
+          req.logger.error('Nuevo Año no encontrado. Enviando 400 al cliente')
           return res.status(400).end()
         }
-        req.body.materia = nuevaMateria._id
+
+        req.body.anio = nuevoAnio._id
+      }
+
+      if (req.body.materias) {
+        // Obtener las materias existentes del curso
+        const materias = await Materia.find({ _id: { $in: req.body.materias } });
+        req.body.materias = [...materias.map((materia) => materia._id)];
       }
 
       // Esto va retornar el estado previo
@@ -106,8 +98,7 @@ async function actualizarCurso(req, res, next) {
 
 //Borramos un curso
 async function borrarCurso(req, res, next) {
-    console.log('Borrar usuario con Id: ', req.params.id)
-  
+    
     if (!req.params.id) {
       res.status(500).send('El parametro Id no esta definido')
     }

@@ -1,8 +1,6 @@
 const express = require('express')
 
 const Materia = require('../schemas/materia')
-const Curso = require('../schemas/curso')
-const Anio = require('../schemas/anio')
 
 const router = express.Router()
 
@@ -13,7 +11,7 @@ router.get('/:id', obtenerMateriaPorId)
 async function obtenerTodosMaterias(req, res, next) {
   
     try {
-      const materias = await Materia.find().populate('cursos').populate('anio')
+      const materias = await Materia.find()
       res.send(materias)
     } catch (err) {
       next(err)
@@ -28,7 +26,7 @@ async function obtenerMateriaPorId(req, res, next) {
     }
   
     try {
-      const materia = await Materia.findById(req.params.id).populate('cursos').populate('anio')
+      const materia = await Materia.findById(req.params.id)
   
       if (!materia || materia.length == 0) {
         res.status(404).send('materia no encontrado')

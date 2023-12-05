@@ -7,7 +7,6 @@ const aniosIniciales = [
     {
       _id: new ObjectId('000000000000000000000000'),
       nombre: '1° Primer Año',
-      materias: [ new ObjectId('000000000000000000000000'), new ObjectId('000000000000000000000001')],
       createdAt: new Date(),
       updatedAt: new Date(),
     },

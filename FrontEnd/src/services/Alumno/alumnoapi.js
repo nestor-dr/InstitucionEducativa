@@ -20,6 +20,4 @@ alumnoService.obtenerAlumnoLegajo = async (Legajo) =>{
     return alumnoElegido;
 }
 
-
-
 export default alumnoService

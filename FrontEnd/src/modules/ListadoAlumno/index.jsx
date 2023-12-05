@@ -20,7 +20,7 @@ import { useTheme } from '@mui/material/styles';
 
 import React, { useState, useEffect } from 'react'
 
-import { Form, Alert  } from 'antd';
+import {  Alert  } from 'antd';
 
 import alumnoService from '../../services/Alumno/alumnoapi';
 
@@ -92,7 +92,6 @@ export default function ListadoAlumno() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [form] = Form.useForm();
   const [alumnos, setAlumnos] = useState([])
 
   useEffect(() => {
@@ -117,7 +116,6 @@ export default function ListadoAlumno() {
 
           setAlumnos((prevAlumnos) => prevAlumnos.filter((a) => a.nroLegajo !== alumno.nroLegajo));
 
-          form.resetFields();
         })
         .catch((error) => {
           console.error('Error al eliminar alumno:', error);

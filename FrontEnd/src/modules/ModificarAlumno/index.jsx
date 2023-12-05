@@ -34,8 +34,9 @@ const ModificarAlumno = () => {
     alumnoService.obtenerAlumnoLegajo(alumnoLegajo)
       .then((res) => {
         setAlumnoData(res);
-        console.log(res); // Asegúrate de que los datos del alumno se impriman correctamente
-  
+
+        const Curso = (res.curso == null) ? '' : res.curso._id;
+        
         // Aquí, estableces los campos del formulario después de que se resuelva la promesa
         form.setFieldsValue({
           nombre: res.nombre,
@@ -43,7 +44,7 @@ const ModificarAlumno = () => {
           direccion: res.direccion,
           nroLegajo: res.nroLegajo,
           edad: res.edad,
-          curso: res.curso.nombre,
+          curso: Curso,
         });
       })
       .catch((error) => {
@@ -58,8 +59,9 @@ const ModificarAlumno = () => {
 
   const onFinish = (values) => {
     // Actualizar datos del alumno en el servidor
-    console.log(values)
-    alumnoService.actualizarAlumno(values).then((res) => {
+    const alumno = values;
+
+    alumnoService.actualizarAlumno(alumno).then((res) => {
         console.log('Alumno modificado exitosamente:', res);
         setSuccess('Alumno modificado exitosamente.');
         
@@ -174,7 +176,8 @@ const ModificarAlumno = () => {
                 
                 
                 <Form.Item label="Curso" name="curso" rules={[{ required: true, message: 'Seleccione el curso' }]}>
-                    <Select>
+                    <Select
+                    >
                         {cursos.map((curso) => (
                         <Option key={curso._id} value={curso._id}>
                             {`${curso.nombre}`}

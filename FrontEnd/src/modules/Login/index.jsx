@@ -11,13 +11,16 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import ImagenLogin from '../../images/Login.jpg'
+import {  Alert  } from 'antd';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import ieService from '../../services/Institucion Educativa/ieapi';
+import { useState } from 'react';
 
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
-  
+  const [error, setError] = useState(null);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -30,7 +33,14 @@ export default function SignInSide() {
       console.log(res);
       localStorage.setItem('usuario', JSON.stringify(res));
       window.location.href= 'Inicio';
-    }); 
+      }).catch((error) => {
+            console.error('Error al Loguearse:', error);
+            setError('Error al loguarse. EL mail o la contraseña no son correctas');
+
+            setTimeout(() => {
+                setError(null);
+            }, 2000);
+        }); 
   };
 
 
@@ -53,6 +63,17 @@ export default function SignInSide() {
             backgroundPosition: 'center',
           }}
         />
+        {error && (
+            <Alert
+                message="Error"
+                description={error}
+                type="error"
+                showIcon
+                closable
+                onClose={() => setError(null)} // Limpiar el estado de error al cerrar la alerta
+                style={{ position: 'fixed', bottom: 20, right: 20 }}
+            />
+        )}
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
           <Box
             sx={{

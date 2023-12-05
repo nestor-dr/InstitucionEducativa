@@ -3,6 +3,7 @@ const express = require('express')
 const Boletin = require('../schemas/boletin')
 const Materia = require('../schemas/materia')
 const Alumno = require('../schemas/alumno')
+const Curso = require('../schemas/curso')
 
 const router = express.Router()
 
@@ -46,27 +47,37 @@ async function obtenerTodosBoletines(req, res, next) {
   
   // Creamos un boletin a partir de los datos obtenidos
   async function crearBoletin(req, res, next) {
-    console.log('crear boletin: ', req.body)
+    console.log('crear boletin: ', req.body);
   
-    const boletin = req.body
+    const { alumnoId, cursoNombre, notas } = req.body;
   
     try {
-      const materia = await Materia.findOne({ name: boletin.materia })
-      const alumno = await Alumno.findOne({ name: boletin.alumno })
-      
-      if (!materia) {
-        res.status(404).send('Materia no encontrado')
-      }
-
+      // Buscar el alumno por el ID
+      const alumno = await Alumno.findById(alumnoId);
+  
+      // Verificar si el alumno existe
       if (!alumno) {
-        res.status(404).send('Alumno no encontrado')
+        return res.status(404).send('Alumno no encontrado');
       }
   
-      const boletinCreado = await Boletin.create({ ...boletin, materia: materia._id, alumno: alumno._id })
+      // Buscar el curso por el nombre
+      const curso = await Curso.findOne({ nombre: cursoNombre });
   
-      res.send(boletinCreado)
+      // Verificar si el curso existe
+      if (!curso) {
+        return res.status(404).send('Curso no encontrado');
+      }
+  
+      // Crear el boletín con las referencias al alumno, al curso y las notas
+      const boletinCreado = await Boletin.create({
+        alumno: alumno._id,
+        curso: curso._id,
+        notas,
+      });
+  
+      res.send(boletinCreado);
     } catch (err) {
-      next(err)
+      next(err);
     }
   }
   

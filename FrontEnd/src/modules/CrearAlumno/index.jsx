@@ -1,12 +1,9 @@
 import { Form, Input, Select, Button, Row, Col, Typography, InputNumber, Alert  } from 'antd';
-
 import { useState, useEffect } from 'react';
-
 import { UserAddOutlined } from '@ant-design/icons';
 
 import alumnoService from '../../services/Alumno/alumnoapi';
 import cursoService from '../../services/Curso/cursoapi';
-
 import miImagen from '../../images/Fondo 6.png';
 
 const { Title, Text } = Typography;
@@ -26,7 +23,7 @@ export default function CrearAlumno() {
     }, []);
 
     const onFinish = (values) => {
-
+        console.log('Valores del formulario:', values);
         alumnoService.crearAlumno(values).then((res) => {
         console.log('Alumno creado exitosamente:', res);
         setSuccess('Alumno creado exitosamente.');
@@ -139,7 +136,7 @@ export default function CrearAlumno() {
                     <InputNumber min={18} max={70} />
                 </Form.Item>
 
-                <Form.Item label="Curso" name="curso" rules={[{ required: true, message: 'Seleccione el curso' }]}>
+                <Form.Item label="Curso" name="curso" rules={[{ message: 'Seleccione el curso' }]}>
                     <Select>
                         {cursos.map((curso) => (
                         <Option key={curso._id} value={curso._id}>

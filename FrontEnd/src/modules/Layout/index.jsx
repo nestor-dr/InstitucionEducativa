@@ -19,7 +19,9 @@ import {
 } from '@ant-design/icons';
 
 import { Layout, Menu, Avatar, Dropdown, Button, Space} from 'antd';
+
 const { Header, Content, Footer, Sider } = Layout;
+
 function getItem(label, key, icon, children) {
   return {
     key,
@@ -32,36 +34,48 @@ function getItem(label, key, icon, children) {
 const usuario = JSON.parse(localStorage.getItem('usuario'));
 const nombreUsuario = usuario && usuario.usuario ? usuario.usuario.nombre : '';
 
-const items = [
-  getItem(<Link to="/Inicio"> Inicio </Link>, '1', <HomeOutlined />),
-  getItem('Alumnos', '2', <TeamOutlined />, 
-  [
-    getItem(<Link to="/Alumnos/Listado"> Listado de Alumnos </Link>, '3', <SolutionOutlined />),
-    getItem(<Link to="/Alumnos/Crear"> Alta de Alumno </Link>, '4', <UserAddOutlined />),
-    getItem(<Link to="/Alumnos/Modificar">Modificar Alumno </Link>, '5', <UserSwitchOutlined />),
-  ]
-  ),
-  getItem('Cursos', '6', <ProfileOutlined />, [
-    getItem(<Link to="/Cursos/Listado"> Listado de Curso </Link>, '7', <ProjectOutlined />), 
-    getItem(<Link to="/Cursos/Crear"> Alta de Curso </Link>, '8', <ScheduleOutlined />),
-    getItem('Asociar Curso', '9', <ReconciliationOutlined />),
-  ]),
-  getItem('Boletines', '10', <ReadOutlined />,[
-    getItem('Buscar Boletin', '11', <FileSearchOutlined />), 
-    getItem('Agregar Boletin', '12', <FileAddOutlined />),
-  ]),
-];
+let items;
+
+if(usuario && usuario.usuario && usuario.usuario.rol == 'admin'){
+  items = [
+    getItem(<Link to="/Inicio"> Inicio </Link>, '1', <HomeOutlined />),
+    getItem('Alumnos', '2', <TeamOutlined />, [
+      getItem(<Link to="/Alumnos/Listado"> Listado de Alumnos </Link>, '3', <SolutionOutlined />),
+      getItem(<Link to="/Alumnos/Crear"> Alta de Alumno </Link>, '4', <UserAddOutlined />),
+      getItem(<Link to="/Alumnos/Modificar">Modificar Alumno </Link>, '5', <UserSwitchOutlined />),
+    ]),
+    getItem('Cursos', '6', <ProfileOutlined />, [
+      getItem(<Link to="/Cursos/Listado"> Listado de Curso </Link>, '7', <ProjectOutlined />), 
+      getItem(<Link to="/Cursos/Crear"> Alta de Curso </Link>, '8', <ScheduleOutlined />),
+      getItem(<Link to="/Cursos/Modificar"> Modificar Curso </Link>, '9', <ReconciliationOutlined />),
+    ]),
+    getItem(<Link to="/DatosPersonales"> Datos Personales </Link>, '13', <HomeOutlined />),
+  ];
+}else if(usuario && usuario.usuario && usuario.usuario.rol == 'profesor'){
+  items = [
+    getItem(<Link to="/Inicio"> Inicio </Link>, '1', <HomeOutlined />),
+    getItem('Boletines', '10', <ReadOutlined />, [
+      getItem(<Link to="/Boletines/Crear"> Generar Boletin </Link>, '11', <FileSearchOutlined />), 
+      getItem('Agregar Boletin', '12', <FileAddOutlined />),
+    ]),
+    getItem(<Link to="/DatosPersonales"> Datos Personales </Link>, '13', <HomeOutlined />),
+  ];
+}
 
 const CerrarSesion = () => {
   localStorage.clear();
   window.location.href= '/';
+};
+const DatosPersonales = () => {
+
+  window.location.href= '/DatosPersonales';
 };
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
   const menuProps = (
     <Menu theme="dark">
-      <Menu.Item key="menu-item-1">Datos Personales</Menu.Item>
+      <Menu.Item key="datosPersonales" onClick={DatosPersonales}>Datos Personales</Menu.Item>
       <Menu.Item key="logout" onClick={CerrarSesion}>Cerrar Sesión</Menu.Item>
     </Menu>
   );
@@ -117,7 +131,7 @@ const App = () => {
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>
-          Ant Design ©2023 Created by Ant UED
+          ©2023 Created by Nestor del Rio
         </Footer>
       </Layout>
     </Layout>

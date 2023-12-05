@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 
 const { Schema } = mongoose
-const { ObjectId } = Schema.Types
 
 const materiaSchema = new Schema({
     nombre: { type: String, required: true, lowercase: true, trim: true }

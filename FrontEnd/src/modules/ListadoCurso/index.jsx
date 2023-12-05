@@ -21,7 +21,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from 'react'
-import { Form, Alert  } from 'antd';
+import {  Alert  } from 'antd';
 import cursoService from '../../services/Curso/cursoapi';
 import Typography from '@mui/material/Typography';
 import miImagen from '../../images/Fondo1.jpg';
@@ -94,7 +94,6 @@ export default function ListadoCurso() {
   const [cursos, setCursos] = useState([])
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [form] = Form.useForm();
 
   useEffect(() => {
     cursoService.obtenerCursos().then(res => 
@@ -113,7 +112,7 @@ export default function ListadoCurso() {
     setPage(0);
   };
 
-  const eliminarAlumno = async (curso) => {
+  const eliminarCurso = async (curso) => {
     try {
       console.log(curso);    
       await cursoService.eliminarCurso(curso._id)
@@ -123,7 +122,6 @@ export default function ListadoCurso() {
 
           setCursos((prevCursos) => prevCursos.filter((a) => a._id !== curso._id));
 
-          form.resetFields();
         })
         .catch((error) => {
           console.error('Error al eliminar curso:', error);
@@ -212,7 +210,15 @@ export default function ListadoCurso() {
                 {curso && curso.anio && curso.anio.nombre ? curso.anio.nombre : 'No tiene año asignado.'}
               </TableCell>
               <TableCell align="right">
-              <Button type="primary" size = "small" style={{ borderRadius: '5px', backgroundColor: '#91caff', color: 'white', margin: '5px', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)'  }} onClick={() => eliminarAlumno(curso)}>
+              <Button 
+                type="primary" 
+                size = "small" 
+                style={{ 
+                  borderRadius: '5px', 
+                  backgroundColor: '#91caff', 
+                  color: 'white', margin: '5px', 
+                  boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)'  
+                }} onClick={() => eliminarCurso(curso)}>
               Eliminar 
               <div style={{ marginLeft: '4px' }} />
               <DeleteIcon />
