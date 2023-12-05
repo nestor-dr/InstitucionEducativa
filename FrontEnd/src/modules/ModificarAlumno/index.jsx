@@ -60,7 +60,7 @@ const ModificarAlumno = () => {
   const onFinish = (values) => {
     // Actualizar datos del alumno en el servidor
     const alumno = values;
-
+    console.log("curso", alumno)
     alumnoService.actualizarAlumno(alumno).then((res) => {
         console.log('Alumno modificado exitosamente:', res);
         setSuccess('Alumno modificado exitosamente.');
@@ -175,7 +175,7 @@ const ModificarAlumno = () => {
                 </Form.Item>
                 
                 
-                <Form.Item label="Curso" name="curso" rules={[{ required: true, message: 'Seleccione el curso' }]}>
+                <Form.Item label="Curso" name="curso" rules={[{ message: 'Seleccione el curso' }]}>
                     <Select
                     >
                         {cursos.map((curso) => (

@@ -70,16 +70,7 @@ async function actualizarCurso(req, res, next) {
         return res.status(404).send('Curso no encontrado')
       }
 
-      if (req.body.anio) {
-        const nuevoAnio = await Anio.findById(req.body.anio)
-
-        if (!nuevoAnio) {
-          req.logger.error('Nuevo Año no encontrado. Enviando 400 al cliente')
-          return res.status(400).end()
-        }
-
-        req.body.anio = nuevoAnio._id
-      }
+      (req.body.anio !== '') ? await Anio.findById(req.body.anio) : req.body.anio = null;
 
       if (req.body.materias) {
         // Obtener las materias existentes del curso

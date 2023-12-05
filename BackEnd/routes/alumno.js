@@ -70,25 +70,17 @@ async function crearAlumno(req, res, next) {
 async function actualizarAlumno(req, res, next) {
   try {
     const alumnoParaActualizar = await Alumno.findOne({nroLegajo: req.body.nroLegajo})
-
+    console.log("body", req.body)
     if (!alumnoParaActualizar) {
       req.logger.error('Alumno no encontrado')
       return res.status(404).send('Alumno no encontrado')
     }
 
-    const nuevoCurso = await Curso.findById(req.body.curso)
+    (req.body.curso !== '') ? await Curso.findById(req.body.curso) : req.body.curso = null;    
 
-    if (!nuevoCurso) {
-      req.logger.error('Nuevo curso no encontrado. Enviando 400 al cliente')
-      return res.status(400).end()
-    }
-    
-    req.body.curso = nuevoCurso._id
-    console.log("despues", req.body)
-    // Esto va retornar el estado previo
-    await alumnoParaActualizar.updateOne(req.body)
-    console.log("despues", alumnoParaActualizar)
-    res.send(alumnoParaActualizar)
+  await alumnoParaActualizar.updateOne(req.body)
+  res.send(alumnoParaActualizar)
+
   } catch (err) {
     next(err)
   }
