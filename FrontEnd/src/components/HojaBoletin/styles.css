@@ -1,5 +1,15 @@
-/* Al imprimir se oculta todo lo que no es el boletin */
+/* El encabezado propio solo aparece al imprimir */
+.encabezado-impresion {
+  display: none;
+}
+
 @media print {
+  /* Sin margen de pagina el navegador no imprime su encabezado y pie (fecha, URL, nro de pagina) */
+  @page {
+    margin: 0;
+  }
+
+  /* Al imprimir se oculta todo lo que no es el boletin */
   .ant-layout-sider,
   .ant-layout-header,
   .ant-layout-footer,
@@ -12,6 +22,19 @@
   .ant-layout-content {
     background: none !important;
     margin: 0 !important;
+  }
+
+  /* Cada boletin es una pagina con su margen y su encabezado */
+  .boletin-pagina {
+    padding: 12mm 15mm;
+  }
+
+  .encabezado-impresion {
+    display: block;
+    text-align: center;
+    font-size: 11px;
+    color: #333;
+    margin-bottom: 25mm;
   }
 
   .boletin-hoja {
@@ -27,11 +50,9 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-}
 
-/* Si se imprimen varios boletines (Mi Boletin), cada uno en su hoja */
-@media print {
-  .boletin-hoja + .boletin-hoja {
+  /* Si se imprimen varios boletines (Mi Boletin), cada uno en su hoja */
+  .boletin-pagina + .boletin-pagina {
     break-before: page;
   }
 }

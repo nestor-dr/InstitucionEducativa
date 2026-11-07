@@ -6,6 +6,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
 import HojaBoletin from '../../components/HojaBoletin';
+import { tituloBoletin } from '../../components/HojaBoletin/titulo';
 import boletinService from '../../services/Boletin/boletinapi';
 
 // Pantalla del alumno: ve sus boletines (solo lectura) y los puede imprimir
@@ -16,12 +17,19 @@ export default function MiBoletin() {
   // El back devuelve solo los boletines del alumno logueado (lo saca del token)
   useEffect(() => {
     boletinService.obtenerMisBoletines()
-      .then((res) => setBoletines(res))
+      .then((res) => {
+        setBoletines(res);
+        // El titulo de la pestaña es el que propone el navegador al guardar como PDF
+        if (res.length > 0) document.title = tituloBoletin(res[0]);
+      })
       .catch((error) => {
         setBoletines([]);
         setError(error.mensaje);
         setTimeout(() => setError(null), 2000);
       });
+
+    // Al salir de la pantalla vuelve el titulo normal
+    return () => { document.title = 'Institución Educativa'; };
   }, []);
 
   if (boletines === null) {

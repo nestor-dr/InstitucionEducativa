@@ -6,6 +6,7 @@ import { PrinterOutlined, EditOutlined, ArrowLeftOutlined } from '@ant-design/ic
 import Typography from '@mui/material/Typography';
 
 import HojaBoletin from '../../components/HojaBoletin';
+import { tituloBoletin } from '../../components/HojaBoletin/titulo';
 import boletinService from '../../services/Boletin/boletinapi';
 
 export default function VerBoletin() {
@@ -17,8 +18,15 @@ export default function VerBoletin() {
   // Trae el boletin por el id de la URL
   useEffect(() => {
     boletinService.obtenerBoletin(id)
-      .then((res) => setBoletin(res))
+      .then((res) => {
+        setBoletin(res);
+        // El titulo de la pestaña es el que propone el navegador al guardar como PDF
+        document.title = tituloBoletin(res);
+      })
       .catch((error) => setError(error.mensaje));
+
+    // Al salir de la pantalla vuelve el titulo normal
+    return () => { document.title = 'Institución Educativa'; };
   }, [id]);
 
   if (error) {
