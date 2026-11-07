@@ -24,6 +24,7 @@ import {
 } from '@ant-design/icons';
 
 import { Layout, Menu, Avatar, Dropdown, Button, Space} from 'antd';
+import { usuarioLogueado, cerrarSesion } from '../../services/sesion';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -94,19 +95,18 @@ const App = () => {
   const navigate = useNavigate();
 
   // Se lee en cada render para que siempre este actualizado (ej: despues de editar los datos personales)
-  const sesion = JSON.parse(localStorage.getItem('usuario'));
-  const usuario = sesion && sesion.usuario ? sesion.usuario : {};
+  const usuario = usuarioLogueado();
   const items = armarMenu(usuario.rol);
 
-  const cerrarSesion = () => {
-    localStorage.clear();
+  const salir = () => {
+    cerrarSesion();
     navigate('/');
   };
 
   const menuUsuario = {
     items: [
       { key: 'datosPersonales', label: 'Datos Personales', icon: <IdcardOutlined />, onClick: () => navigate('/DatosPersonales') },
-      { key: 'logout', label: 'Cerrar Sesión', icon: <LogoutOutlined />, onClick: cerrarSesion },
+      { key: 'logout', label: 'Cerrar Sesión', icon: <LogoutOutlined />, onClick: salir },
     ],
   };
 

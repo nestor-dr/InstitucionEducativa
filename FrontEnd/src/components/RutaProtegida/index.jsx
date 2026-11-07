@@ -1,18 +1,19 @@
 import PropTypes from 'prop-types';
 import { Navigate, Outlet } from 'react-router-dom';
+import { obtenerSesion } from '../../services/sesion';
 
 // Deja entrar solo si hay sesion y, si se indican roles, si el usuario tiene alguno
 // Ej: <Route element={<RutaProtegida roles={['admin']} />}> ... </Route>
 export default function RutaProtegida({ roles }) {
-  const usuario = JSON.parse(localStorage.getItem('usuario'));
+  const sesion = obtenerSesion();
 
   // Sin sesion vuelve al login
-  if (!usuario || !usuario.token) {
+  if (!sesion || !sesion.token) {
     return <Navigate to="/" replace />;
   }
 
   // Con sesion pero sin el rol necesario vuelve al inicio
-  if (roles && !roles.includes(usuario.usuario.rol)) {
+  if (roles && !roles.includes(sesion.usuario.rol)) {
     return <Navigate to="/Inicio" replace />;
   }
 

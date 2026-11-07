@@ -1,5 +1,6 @@
 import Typography from '@mui/material/Typography';
 import miImagen from '../../images/Fondo 6.png';
+import { usuarioLogueado } from '../../services/sesion';
 
 // Texto de bienvenida segun el rol
 const descripcionPorRol = {
@@ -9,8 +10,7 @@ const descripcionPorRol = {
 };
 
 function Inicio() {
-  const sesion = JSON.parse(localStorage.getItem('usuario'));
-  const usuario = sesion && sesion.usuario ? sesion.usuario : {};
+  const usuario = usuarioLogueado();
 
   return(
     <div style={{ textAlign: 'center' }}>

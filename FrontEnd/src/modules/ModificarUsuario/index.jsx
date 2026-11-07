@@ -8,6 +8,7 @@ import usuarioService from '../../services/Usuario/usuarioapi';
 import rolService from '../../services/Rol/rolapi';
 import alumnoService from '../../services/Alumno/alumnoapi';
 import { reglaPassword } from '../../utils/validaciones';
+import { usuarioLogueado } from '../../services/sesion';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -24,8 +25,7 @@ export default function ModificarUsuario() {
   const [form] = Form.useForm();
 
   // El admin no puede cambiarse su propio rol
-  const sesion = JSON.parse(localStorage.getItem('usuario'));
-  const esUsuarioPropio = sesion && sesion.usuario && sesion.usuario._id === usuarioId;
+  const esUsuarioPropio = Boolean(usuarioId) && usuarioLogueado()._id === usuarioId;
 
   const rolElegido = Form.useWatch('rol', form);
   const esRolAlumno = roles.some((rol) => rol._id === rolElegido && rol.descripcion === 'alumno');

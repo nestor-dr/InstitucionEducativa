@@ -18,6 +18,7 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import usuarioService from '../../services/Usuario/usuarioapi';
 import CeldaTexto from '../../components/CeldaTexto';
+import { usuarioLogueado } from '../../services/sesion';
 
 const estiloBoton = (color) => ({
   borderRadius: '5px',
@@ -36,8 +37,7 @@ export default function ListadoUsuarios() {
   const navigate = useNavigate();
 
   // El usuario logueado no se puede borrar a si mismo
-  const sesion = JSON.parse(localStorage.getItem('usuario'));
-  const idPropio = sesion && sesion.usuario ? sesion.usuario._id : null;
+  const idPropio = usuarioLogueado()._id;
 
   const mostrarMensaje = (setMensaje, mensaje) => {
     setMensaje(mensaje);

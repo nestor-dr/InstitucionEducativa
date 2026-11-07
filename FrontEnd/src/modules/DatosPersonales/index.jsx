@@ -5,6 +5,7 @@ import { Form, Input, Button, Alert, Divider } from 'antd';
 
 import usuarioService from '../../services/Usuario/usuarioapi';
 import { reglaPassword } from '../../utils/validaciones';
+import { obtenerSesion, actualizarSesion } from '../../services/sesion';
 
 const DatosPersonales = () => {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ const DatosPersonales = () => {
   const [success, setSuccess] = useState(null);
   const [form] = Form.useForm();
 
-  const sesion = JSON.parse(localStorage.getItem('usuario'));
+  const sesion = obtenerSesion();
   const usuario = sesion.usuario;
 
   // Guarda nombre, apellido y (si se cargo) la contraseña nueva
@@ -26,7 +27,7 @@ const DatosPersonales = () => {
       .then((res) => {
         // Actualiza los datos guardados de la sesion para que se vean en el menu
         sesion.usuario = { ...usuario, nombre: res.nombre, apellido: res.apellido };
-        localStorage.setItem('usuario', JSON.stringify(sesion));
+        actualizarSesion(sesion);
 
         form.setFieldsValue({ password: '', confirmarPassword: '' });
         setSuccess('Datos actualizados exitosamente.');

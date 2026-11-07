@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { obtenerSesion, cerrarSesion } from './sesion'
 
 const api = axios.create({
   // URL del back tomada de FrontEnd/.env
@@ -9,9 +10,9 @@ const api = axios.create({
 // Antes de cada pedido agrega el token guardado al loguearse
 api.interceptors.request.use(
   (config) => {
-    const usuario = JSON.parse(localStorage.getItem('usuario'))
-    if (usuario && usuario.token) {
-      config.headers.Authorization = `Bearer ${usuario.token}`
+    const sesion = obtenerSesion()
+    if (sesion && sesion.token) {
+      config.headers.Authorization = `Bearer ${sesion.token}`
     }
     return config
   },
@@ -24,8 +25,8 @@ api.interceptors.response.use(
     const status = error.response ? error.response.status : null
 
     // Token vencido o invalido: se cierra la sesion y vuelve al login
-    if (status === 401 && localStorage.getItem('usuario')) {
-      localStorage.clear()
+    if (status === 401 && obtenerSesion()) {
+      cerrarSesion()
       window.location.href = '/'
     }
 
