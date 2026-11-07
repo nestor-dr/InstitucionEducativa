@@ -26,6 +26,7 @@ import { useNavigate } from 'react-router-dom';
 import { Alert, Popconfirm } from 'antd';
 
 import boletinService from '../../services/Boletin/boletinapi';
+import CeldaTexto from '../../components/CeldaTexto';
 import miImagen from '../../images/Fondo1.jpg';
 
 function TablePaginationActions(props) {
@@ -116,7 +117,7 @@ export default function ListadoBoletines() {
   };
 
   return (
-    <div style={{ position: 'relative', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', overflow: 'hidden', width: '100%' }}>
       <div style={{ position: 'absolute', top: 110, opacity: 0.1 }}>
         <img src={miImagen} alt="Fondo" style={{ maxWidth: '100%' }} />
       </div>
@@ -148,15 +149,16 @@ export default function ListadoBoletines() {
       )}
 
       <TableContainer component={Paper}>
-        <Table>
+        {/* Ancho fijo por columna: cada fila queda en una sola linea */}
+        <Table style={{ tableLayout: 'fixed', minWidth: 900 }}>
           <TableHead>
             <TableRow style={{ backgroundColor: '#0958d9' }}>
               <TableCell style={{ color: 'white' }}>ALUMNO</TableCell>
-              <TableCell style={{ color: 'white' }}>LEGAJO</TableCell>
-              <TableCell style={{ color: 'white' }}>CURSO</TableCell>
-              <TableCell align="center" style={{ color: 'white' }}>PROMEDIO</TableCell>
-              <TableCell style={{ color: 'white' }}>FECHA</TableCell>
-              <TableCell align="center" style={{ color: 'white' }}>ACCIONES</TableCell>
+              <TableCell style={{ color: 'white', width: 90 }}>LEGAJO</TableCell>
+              <TableCell style={{ color: 'white', width: '20%' }}>CURSO</TableCell>
+              <TableCell align="center" style={{ color: 'white', width: 105 }}>PROMEDIO</TableCell>
+              <TableCell style={{ color: 'white', width: 100 }}>FECHA</TableCell>
+              <TableCell align="center" style={{ color: 'white', width: 330 }}>ACCIONES</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -170,16 +172,16 @@ export default function ListadoBoletines() {
               : boletines
             ).map((boletin) => (
               <TableRow key={boletin._id}>
-                <TableCell component="th" scope="row" style={{ textTransform: 'capitalize' }}>
-                  {boletin.alumno ? `${boletin.alumno.apellido}, ${boletin.alumno.nombre}` : 'Alumno no encontrado'}
-                </TableCell>
-                <TableCell>{boletin.alumno ? boletin.alumno.nroLegajo : '-'}</TableCell>
-                <TableCell>
-                  {boletin.curso ? boletin.curso.nombre : 'Curso no encontrado'}
-                  {boletin.curso && boletin.curso.anio ? ` (${boletin.curso.anio.nombre})` : ''}
-                </TableCell>
-                <TableCell align="center" style={{ fontWeight: 'bold' }}>{boletin.promedio}</TableCell>
-                <TableCell>{new Date(boletin.createdAt).toLocaleDateString('es-AR')}</TableCell>
+                <CeldaTexto
+                  texto={boletin.alumno ? `${boletin.alumno.apellido}, ${boletin.alumno.nombre}` : 'Alumno no encontrado'}
+                  style={{ textTransform: 'capitalize' }}
+                />
+                <CeldaTexto texto={boletin.alumno ? boletin.alumno.nroLegajo : '-'} />
+                <CeldaTexto
+                  texto={`${boletin.curso ? boletin.curso.nombre : 'Curso no encontrado'}${boletin.curso && boletin.curso.anio ? ` (${boletin.curso.anio.nombre})` : ''}`}
+                />
+                <CeldaTexto texto={boletin.promedio} align="center" style={{ fontWeight: 'bold' }} />
+                <CeldaTexto texto={new Date(boletin.createdAt).toLocaleDateString('es-AR')} />
                 <TableCell align="center" style={{ whiteSpace: 'nowrap' }}>
                   <Button size="small" style={estiloBoton('#4096ff')} onClick={() => navigate(`/Boletines/Ver/${boletin._id}`)}>
                     Ver

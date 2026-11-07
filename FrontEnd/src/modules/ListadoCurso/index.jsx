@@ -17,13 +17,10 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useState, useEffect } from 'react'
 import {  Alert  } from 'antd';
 import cursoService from '../../services/Curso/cursoapi';
+import CeldaTexto from '../../components/CeldaTexto';
 import Typography from '@mui/material/Typography';
 import miImagen from '../../images/Fondo1.jpg';
 import Button from '@mui/material/Button';
@@ -139,7 +136,7 @@ export default function ListadoCurso() {
   };
 
   return (
-    <div style={{ position: 'relative', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', overflow: 'hidden', width: '100%' }}>
       <div style={{ position: 'absolute', top: 110, opacity: 0.1}}>
         <img src={miImagen} alt="Descripción de la imagen" style={{ maxWidth: '100%' }} />
       </div>
@@ -169,13 +166,14 @@ export default function ListadoCurso() {
           />
         )}
        <TableContainer component={Paper}>
-       <Table>
+       {/* Ancho fijo por columna: cada fila queda en una sola linea */}
+       <Table style={{ tableLayout: 'fixed', minWidth: 760 }}>
       <TableHead >
            <TableRow style={{ backgroundColor: '#0958d9'}}>
-             <TableCell style={{ color: 'white' , width: '20%'}}>CURSO </TableCell>
-             <TableCell style={{ color: 'white' , width: '30%'}}>MATERIAS</TableCell>
-             <TableCell align="center" style={{ color: 'white' , width: '30%'}}>AÑO</TableCell>
-             <TableCell align="center" style={{ color: 'white' , width: '20%'}}>ACCIONES</TableCell>
+             <TableCell style={{ color: 'white', width: 110 }}>CURSO</TableCell>
+             <TableCell style={{ color: 'white' }}>MATERIAS</TableCell>
+             <TableCell style={{ color: 'white', width: 170 }}>AÑO</TableCell>
+             <TableCell align="center" style={{ color: 'white', width: 140 }}>ACCIONES</TableCell>
            </TableRow>
         </TableHead>
         <TableBody>
@@ -184,33 +182,15 @@ export default function ListadoCurso() {
             : cursos
           ).map((curso) => (
             <TableRow key={curso._id}>
-              <TableCell component="th" scope="row">
-                {curso.nombre}
-              </TableCell>
-              <TableCell style={{ width: 160 }} align="right">
-                {curso && curso.materias && curso.materias.length > 0 ? (
-                  <Accordion>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
-                    >
-                      MATERIAS
-                    </AccordionSummary>
-                    <AccordionDetails style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                      {curso.materias.map((materia, index) => (
-                        <div key={index} style={{ whiteSpace: 'nowrap', fontWeight: 'bold' }}>
-                          - {materia.nombre}<br />
-                        </div>
-                      ))}
-                    </AccordionDetails>
-                  </Accordion>
-                ) : 'No tiene materias asignadas.'}
-              </TableCell>
-              <TableCell style={{ width: 160, whiteSpace: 'nowrap' }} align="center">
-                {curso && curso.anio && curso.anio.nombre ? curso.anio.nombre : 'No tiene año asignado.'}
-              </TableCell>
-              <TableCell align="right">
+              <CeldaTexto texto={curso.nombre} />
+              {/* Las materias en una linea; si no entran, se ven todas al pasar el mouse */}
+              <CeldaTexto
+                texto={curso.materias && curso.materias.length > 0
+                  ? `(${curso.materias.length}) ${curso.materias.map((materia) => materia.nombre).join(', ')}`
+                  : 'Sin materias asignadas'}
+              />
+              <CeldaTexto texto={curso.anio && curso.anio.nombre ? curso.anio.nombre : 'Sin año asignado'} />
+              <TableCell align="center" style={{ whiteSpace: 'nowrap' }}>
               <Button 
                 type="primary" 
                 size = "small" 
@@ -229,7 +209,7 @@ export default function ListadoCurso() {
           ))}
           {emptyRows > 0 && (
             <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
+              <TableCell colSpan={4} />
             </TableRow>
           )}
         </TableBody>
@@ -237,7 +217,7 @@ export default function ListadoCurso() {
           <TableRow>
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, { label: 'Todos', value: -1 }]}
-              colSpan={3}
+              colSpan={4}
               count={cursos.length}
               rowsPerPage={rowsPerPage}
               page={page}

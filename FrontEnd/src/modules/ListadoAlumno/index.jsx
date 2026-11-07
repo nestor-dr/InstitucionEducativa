@@ -24,6 +24,7 @@ import React, { useState, useEffect } from 'react'
 import {  Alert  } from 'antd';
 
 import alumnoService from '../../services/Alumno/alumnoapi';
+import CeldaTexto from '../../components/CeldaTexto';
 
 import miImagen from '../../images/Fondo1.jpg';
 
@@ -134,7 +135,7 @@ export default function ListadoAlumno() {
   };
 
   return (
-    <div style={{ position: 'relative', overflow: 'hidden' }}>
+    <div style={{ position: 'relative', overflow: 'hidden', width: '100%' }}>
       <div style={{ position: 'absolute', top: 110, opacity: 0.1}}>
         <img src={miImagen} alt="Descripción de la imagen" style={{ maxWidth: '100%' }} />
       </div>
@@ -165,42 +166,31 @@ export default function ListadoAlumno() {
         )}
 
        <TableContainer component={Paper}>
-       <Table>
+       {/* Ancho fijo por columna: cada fila queda en una sola linea */}
+       <Table style={{ tableLayout: 'fixed', minWidth: 860 }}>
           <TableHead >
             <TableRow style={{ backgroundColor: '#0958d9'}}>
-              <TableCell style={{ color: 'white' }}>NOMBRE </TableCell>
-              <TableCell align="right" style={{ color: 'white' }}>APELLIDO</TableCell>
-              <TableCell align="right" style={{ color: 'white' }}>LEGAJO</TableCell>
-              <TableCell align="right" style={{ color: 'white' }}>DIRECCION</TableCell>
-              <TableCell align="right" style={{ color: 'white' }}>EDAD</TableCell>
-              <TableCell align="right" style={{ color: 'white' }}>CURSO</TableCell>
-              <TableCell align="right" style={{ color: 'white' }}>ACCIONES</TableCell>
+              <TableCell style={{ color: 'white', width: '16%' }}>NOMBRE</TableCell>
+              <TableCell style={{ color: 'white', width: '16%' }}>APELLIDO</TableCell>
+              <TableCell style={{ color: 'white', width: 90 }}>LEGAJO</TableCell>
+              <TableCell style={{ color: 'white', width: '24%' }}>DIRECCION</TableCell>
+              <TableCell align="center" style={{ color: 'white', width: 70 }}>EDAD</TableCell>
+              <TableCell style={{ color: 'white', width: '14%' }}>CURSO</TableCell>
+              <TableCell align="center" style={{ color: 'white', width: 140 }}>ACCIONES</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {(rowsPerPage > 0 
-            ? alumnos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) 
+            {(rowsPerPage > 0
+            ? alumnos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : alumnos).map((alumno) => (
               <TableRow key={alumno.nroLegajo}>
-                <TableCell component="th" scope="row">
-                  {alumno.nombre}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {alumno.apellido}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {alumno.nroLegajo}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {alumno.direccion}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {alumno.edad}
-                </TableCell>
-                <TableCell style={{ width: 160 }} align="right">
-                  {alumno && alumno.curso && alumno.curso.nombre ? alumno.curso.nombre : 'No tiene curso asignado.'}
-                </TableCell>
-                <TableCell align="right">
+                <CeldaTexto texto={alumno.nombre} style={{ textTransform: 'capitalize' }} />
+                <CeldaTexto texto={alumno.apellido} style={{ textTransform: 'capitalize' }} />
+                <CeldaTexto texto={alumno.nroLegajo} />
+                <CeldaTexto texto={alumno.direccion} />
+                <CeldaTexto texto={alumno.edad} align="center" />
+                <CeldaTexto texto={alumno.curso && alumno.curso.nombre ? alumno.curso.nombre : 'Sin curso'} />
+                <TableCell align="center" style={{ whiteSpace: 'nowrap' }}>
                   <Button type="primary" size = "small" style={{ borderRadius: '5px', backgroundColor: '#91caff', color: 'white', margin: '5px', boxShadow: '2px 2px 5px rgba(0, 0, 0, 0.2)'  }} onClick={() => eliminarAlumno(alumno)}>
                     Eliminar 
                     <div style={{ marginLeft: '4px' }} />
@@ -211,7 +201,7 @@ export default function ListadoAlumno() {
             ))}
             {emptyRows > 0 && (
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
+                <TableCell colSpan={7} />
               </TableRow>
             )}
           </TableBody>
@@ -219,7 +209,7 @@ export default function ListadoAlumno() {
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: 'Todos', value: -1 }]}
-                colSpan={3}
+                colSpan={7}
                 count={alumnos.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
