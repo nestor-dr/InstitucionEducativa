@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -65,3 +66,24 @@ export default function HojaBoletin({ boletin }) {
     </div>
   );
 }
+
+// Datos que necesita: el boletin tal como lo devuelve el back (con alumno, curso y materias completos)
+HojaBoletin.propTypes = {
+  boletin: PropTypes.shape({
+    alumno: PropTypes.shape({
+      nombre: PropTypes.string,
+      apellido: PropTypes.string,
+      nroLegajo: PropTypes.string,
+    }),
+    curso: PropTypes.shape({
+      nombre: PropTypes.string,
+      anio: PropTypes.shape({ nombre: PropTypes.string }),
+    }),
+    notas: PropTypes.arrayOf(PropTypes.shape({
+      materia: PropTypes.shape({ _id: PropTypes.string, nombre: PropTypes.string }),
+      nota: PropTypes.number,
+    })).isRequired,
+    promedio: PropTypes.number,
+    createdAt: PropTypes.string,
+  }).isRequired,
+};

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Navigate, Outlet } from 'react-router-dom';
 
 // Deja entrar solo si hay sesion y, si se indican roles, si el usuario tiene alguno
@@ -17,3 +18,8 @@ export default function RutaProtegida({ roles }) {
 
   return <Outlet />;
 }
+
+// Roles que pueden entrar (si no se pasa, alcanza con estar logueado)
+RutaProtegida.propTypes = {
+  roles: PropTypes.arrayOf(PropTypes.string),
+};

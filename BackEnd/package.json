@@ -6,7 +6,7 @@
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www ",
     "format": "prettier --write '**/*.{js,json,md}'",
-    "lint": "eslint . --ext .js",
+    "lint": "eslint . bin/www --ext .js --max-warnings 0",
     "migrate": "migrate-mongo",
     "migrate-dev": "migrate-mongo"
   },
