@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -164,6 +165,7 @@ export default function ListadoAlumno() {
         )}
 
        <TableContainer component={Paper}>
+       <Table>
           <TableHead >
             <TableRow style={{ backgroundColor: '#0958d9'}}>
               <TableCell style={{ color: 'white' }}>NOMBRE </TableCell>
@@ -234,6 +236,7 @@ export default function ListadoAlumno() {
               />
             </TableRow>
           </TableFooter>
+        </Table>
         </TableContainer>
     </div>
   );

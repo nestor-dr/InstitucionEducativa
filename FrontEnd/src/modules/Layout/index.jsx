@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet, Link } from 'react-router-dom'
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import miImagen from '../../images/Fondo 6.png';
 import {
   HomeOutlined,
@@ -14,6 +14,10 @@ import {
   ReadOutlined,
   FileSearchOutlined,
   FileAddOutlined,
+  BookOutlined,
+  CalendarOutlined,
+  IdcardOutlined,
+  LogoutOutlined,
   DownOutlined,
   UserOutlined
 } from '@ant-design/icons';
@@ -22,6 +26,7 @@ import { Layout, Menu, Avatar, Dropdown, Button, Space} from 'antd';
 
 const { Header, Content, Footer, Sider } = Layout;
 
+// La key de cada item es la ruta, asi el menu marca la pantalla actual
 function getItem(label, key, icon, children) {
   return {
     key,
@@ -31,83 +36,92 @@ function getItem(label, key, icon, children) {
   };
 }
 
-const usuario = JSON.parse(localStorage.getItem('usuario'));
-const nombreUsuario = usuario && usuario.usuario ? usuario.usuario.nombre : '';
+// Arma el menu lateral segun el rol del usuario logueado
+function armarMenu(rol) {
+  const inicio = getItem(<Link to="/Inicio"> Inicio </Link>, '/Inicio', <HomeOutlined />);
+  const datosPersonales = getItem(<Link to="/DatosPersonales"> Datos Personales </Link>, '/DatosPersonales', <IdcardOutlined />);
 
-let items;
+  if (rol === 'admin') {
+    return [
+      inicio,
+      getItem('Alumnos', 'alumnos', <TeamOutlined />, [
+        getItem(<Link to="/Alumnos/Listado"> Listado de Alumnos </Link>, '/Alumnos/Listado', <SolutionOutlined />),
+        getItem(<Link to="/Alumnos/Crear"> Alta de Alumno </Link>, '/Alumnos/Crear', <UserAddOutlined />),
+        getItem(<Link to="/Alumnos/Modificar">Modificar Alumno </Link>, '/Alumnos/Modificar', <UserSwitchOutlined />),
+      ]),
+      getItem('Cursos', 'cursos', <ProfileOutlined />, [
+        getItem(<Link to="/Cursos/Listado"> Listado de Curso </Link>, '/Cursos/Listado', <ProjectOutlined />),
+        getItem(<Link to="/Cursos/Crear"> Alta de Curso </Link>, '/Cursos/Crear', <ScheduleOutlined />),
+        getItem(<Link to="/Cursos/Modificar"> Modificar Curso </Link>, '/Cursos/Modificar', <ReconciliationOutlined />),
+      ]),
+      getItem(<Link to="/Materias/Listado"> Materias </Link>, '/Materias/Listado', <BookOutlined />),
+      getItem(<Link to="/Anios/Listado"> Años </Link>, '/Anios/Listado', <CalendarOutlined />),
+      datosPersonales,
+    ];
+  }
 
-if(usuario && usuario.usuario && usuario.usuario.rol == 'admin'){
-  items = [
-    getItem(<Link to="/Inicio"> Inicio </Link>, '1', <HomeOutlined />),
-    getItem('Alumnos', '2', <TeamOutlined />, [
-      getItem(<Link to="/Alumnos/Listado"> Listado de Alumnos </Link>, '3', <SolutionOutlined />),
-      getItem(<Link to="/Alumnos/Crear"> Alta de Alumno </Link>, '4', <UserAddOutlined />),
-      getItem(<Link to="/Alumnos/Modificar">Modificar Alumno </Link>, '5', <UserSwitchOutlined />),
-    ]),
-    getItem('Cursos', '6', <ProfileOutlined />, [
-      getItem(<Link to="/Cursos/Listado"> Listado de Curso </Link>, '7', <ProjectOutlined />), 
-      getItem(<Link to="/Cursos/Crear"> Alta de Curso </Link>, '8', <ScheduleOutlined />),
-      getItem(<Link to="/Cursos/Modificar"> Modificar Curso </Link>, '9', <ReconciliationOutlined />),
-    ]),
-    getItem(<Link to="/DatosPersonales"> Datos Personales </Link>, '13', <HomeOutlined />),
-  ];
-}else if(usuario && usuario.usuario && usuario.usuario.rol == 'profesor'){
-  items = [
-    getItem(<Link to="/Inicio"> Inicio </Link>, '1', <HomeOutlined />),
-    getItem('Boletines', '10', <ReadOutlined />, [
-      getItem(<Link to="/Boletines/Listado"> Listado de Boletines </Link>, '11', <FileSearchOutlined />),
-      getItem(<Link to="/Boletines/Crear"> Generar Boletin </Link>, '12', <FileAddOutlined />),
-    ]),
-    getItem(<Link to="/DatosPersonales"> Datos Personales </Link>, '13', <HomeOutlined />),
-  ];
+  if (rol === 'profesor') {
+    return [
+      inicio,
+      getItem('Boletines', 'boletines', <ReadOutlined />, [
+        getItem(<Link to="/Boletines/Listado"> Listado de Boletines </Link>, '/Boletines/Listado', <FileSearchOutlined />),
+        getItem(<Link to="/Boletines/Crear"> Generar Boletin </Link>, '/Boletines/Crear', <FileAddOutlined />),
+      ]),
+      datosPersonales,
+    ];
+  }
+
+  return [inicio, datosPersonales];
 }
-
-const CerrarSesion = () => {
-  localStorage.clear();
-  window.location.href= '/';
-};
-const DatosPersonales = () => {
-
-  window.location.href= '/DatosPersonales';
-};
 
 const App = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const menuProps = (
-    <Menu theme="dark">
-      <Menu.Item key="datosPersonales" onClick={DatosPersonales}>Datos Personales</Menu.Item>
-      <Menu.Item key="logout" onClick={CerrarSesion}>Cerrar Sesión</Menu.Item>
-    </Menu>
-  );
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Se lee en cada render para que siempre este actualizado (ej: despues de editar los datos personales)
+  const sesion = JSON.parse(localStorage.getItem('usuario'));
+  const usuario = sesion && sesion.usuario ? sesion.usuario : {};
+  const items = armarMenu(usuario.rol);
+
+  const cerrarSesion = () => {
+    localStorage.clear();
+    navigate('/');
+  };
+
+  const menuUsuario = {
+    items: [
+      { key: 'datosPersonales', label: 'Datos Personales', icon: <IdcardOutlined />, onClick: () => navigate('/DatosPersonales') },
+      { key: 'logout', label: 'Cerrar Sesión', icon: <LogoutOutlined />, onClick: cerrarSesion },
+    ],
+  };
+
   return (
     <Layout style={{ minHeight: '100vh', }}>
       <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
         <div className="demo-logo-vertical" />
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={items} />
+        <Menu theme="dark" selectedKeys={[location.pathname]} mode="inline" items={items} />
       </Sider>
       <Layout>
         <Header
           style={{
-            padding: 0,
+            padding: '0 24px',
             background: '#001d66',
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'center',
+            gap: '8px',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', marginLeft: '1500px' }}>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <Dropdown overlay={menuProps} trigger={['click']}>
-                <Button type="primary" size='default' style={{ backgroundColor: '#003eb3', borderColor: '#003eb3' }}>
-                  <Space>
-                    Hola{nombreUsuario} <DownOutlined />
-                  </Space>
-                </Button>
-              </Dropdown>
-            </div>
-            <div style={{ marginLeft: '8px' }} />
-            <Avatar style={{ backgroundColor: '#ffa39e' }} icon={<UserOutlined />} />
-          </div>
+          <Dropdown menu={menuUsuario} trigger={['click']}>
+            <Button type="primary" size='default' style={{ backgroundColor: '#003eb3', borderColor: '#003eb3', textTransform: 'capitalize' }}>
+              <Space>
+                {`Hola, ${usuario.nombre} (${usuario.rol})`}
+                <DownOutlined />
+              </Space>
+            </Button>
+          </Dropdown>
+          <Avatar style={{ backgroundColor: '#ffa39e' }} icon={<UserOutlined />} />
         </Header>
         <Content
           style={{

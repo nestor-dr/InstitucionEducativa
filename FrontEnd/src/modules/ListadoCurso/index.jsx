@@ -2,6 +2,7 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import Table from '@mui/material/Table';
 import TableHead from '@mui/material/TableHead';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -168,6 +169,7 @@ export default function ListadoCurso() {
           />
         )}
        <TableContainer component={Paper}>
+       <Table>
       <TableHead >
            <TableRow style={{ backgroundColor: '#0958d9'}}>
              <TableCell style={{ color: 'white' , width: '20%'}}>CURSO </TableCell>
@@ -252,6 +254,7 @@ export default function ListadoCurso() {
             />
           </TableRow>
         </TableFooter>
+    </Table>
     </TableContainer>
     </div>
   </div>

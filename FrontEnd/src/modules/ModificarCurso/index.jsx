@@ -71,14 +71,17 @@ const ModificarAlumno = () => {
 
 
   const onFinish = (values) => {
-    // Actualizar datos del alumno en el servidor
+    // Actualizar datos del curso en el servidor (el id sale del curso seleccionado)
+    const { cursoId, ...curso } = values;
 
-    cursoService.actualizarCurso(values).then((res) => {
+    cursoService.actualizarCurso(cursoId, curso).then((res) => {
         console.log('Curso modificado exitosamente:', res);
         setSuccess('Curso modificado exitosamente.');
-        
+
             form.resetFields();
-        
+            // Recarga la lista por si cambio el nombre
+            cargarDatosIniciales();
+
             setTimeout(() => {
                 setSuccess(null);
             }, 2000);
@@ -151,7 +154,7 @@ const ModificarAlumno = () => {
         labelCol={{ span: 9 }}
         wrapperCol={{ span: 16 }}
       >
-        <Form.Item label="Seleccionar Curso" name="nombre" rules={[{ required: true, message: 'Seleccione el Curso' }]}>
+        <Form.Item label="Seleccionar Curso" name="cursoId" rules={[{ required: true, message: 'Seleccione el Curso' }]}>
           <Select onChange={obtenerDatosCurso}>
             {cursos.map((curso) => (
               <Option key={curso._id} value={curso._id}>

@@ -2,7 +2,7 @@ const express = require('express')
 
 const Alumno = require('../schemas/alumno')
 const Curso = require('../schemas/curso')
-const { ObjectId } = require('mongodb')
+const Boletin = require('../schemas/boletin')
 
 const permitirRoles = require('../middlewares/authorization')
 
@@ -11,7 +11,7 @@ const router = express.Router()
 router.get('/', obtenerTodosAlumnos)
 router.get('/:id', obtenerAlumnoPorId)
 router.post('/', permitirRoles('admin'), crearAlumno)
-router.put('/', permitirRoles('admin'), actualizarAlumno)
+router.put('/:id', permitirRoles('admin'), actualizarAlumno)
 router.delete('/:id', permitirRoles('admin'), borrarAlumno)
 
 //Obtiene todos los alumnos existentes
@@ -75,18 +75,35 @@ async function crearAlumno(req, res, next) {
 // Actualizamos un alumno
 async function actualizarAlumno(req, res, next) {
   try {
-    const alumnoParaActualizar = await Alumno.findOne({nroLegajo: req.body.nroLegajo})
-    console.log("body", req.body)
+    const alumnoParaActualizar = await Alumno.findById(req.params.id)
     if (!alumnoParaActualizar) {
-      req.logger.error('Alumno no encontrado')
       return res.status(404).send('Alumno no encontrado')
     }
 
-    (req.body.curso !== '') ? await Curso.findById(req.body.curso) : req.body.curso = null;    
+    // Si cambia el legajo, que no lo tenga otro alumno
+    if (req.body.nroLegajo && req.body.nroLegajo !== alumnoParaActualizar.nroLegajo) {
+      const legajoUsado = await Alumno.findOne({ nroLegajo: req.body.nroLegajo })
+      if (legajoUsado) {
+        return res.status(400).send('El número de legajo ya existe')
+      }
+    }
 
-  await alumnoParaActualizar.updateOne(req.body)
-  res.send(alumnoParaActualizar)
+    // Si viene un curso tiene que existir; si viene vacio el alumno queda sin curso
+    if (req.body.curso) {
+      const curso = await Curso.findById(req.body.curso)
+      if (!curso) {
+        return res.status(400).send('El curso indicado no existe')
+      }
+    } else {
+      req.body.curso = null
+    }
 
+    // Devuelve el alumno ya actualizado
+    const alumnoActualizado = await Alumno.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    }).populate('curso')
+    res.send(alumnoActualizado)
   } catch (err) {
     next(err)
   }
@@ -104,6 +121,12 @@ async function borrarAlumno(req, res, next) {
     
     if (!alumno) {
       return res.status(404).send('Alumno no encontrado');
+    }
+
+    // No se borra un alumno con boletines, para no dejar boletines huerfanos
+    const cantidadBoletines = await Boletin.countDocuments({ alumno: alumno._id });
+    if (cantidadBoletines > 0) {
+      return res.status(400).send(`No se puede borrar: el alumno tiene ${cantidadBoletines} boletín(es). Eliminalos primero.`);
     }
 
     await Alumno.deleteOne({ _id: alumno._id });

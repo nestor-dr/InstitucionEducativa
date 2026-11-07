@@ -4,7 +4,7 @@ const alumnoService = {}
 
 alumnoService.crearAlumno = async (alumno) => {return await api.post('/alumnos', alumno)}
 alumnoService.eliminarAlumno = async (alumnoId) => {return await api.delete(`/alumnos/${alumnoId}`)};
-alumnoService.actualizarAlumno = async (alumno) => {return await api.put('/alumnos', alumno)}
+alumnoService.actualizarAlumno = async (alumnoId, alumno) => {return await api.put(`/alumnos/${alumnoId}`, alumno)}
 alumnoService.obtenerAlumnos = async () => {return await api.get('/alumnos')};
 alumnoService.obtenerAlumno = async (alumnoId) => {return await api.get(`/alumnos/${alumnoId}`)};
 

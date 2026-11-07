@@ -11,7 +11,7 @@ const { Option } = Select;
 const ModificarAlumno = () => {
   const [cursos, setCursos] = useState([]);
   const [alumnos, setAlumnos] = useState([]);
-  const [, setAlumnoData] = useState(null);
+  const [alumnoData, setAlumnoData] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [form] = Form.useForm();
@@ -60,14 +60,15 @@ const ModificarAlumno = () => {
 
   const onFinish = (values) => {
     // Actualizar datos del alumno en el servidor
-    const alumno = values;
-    console.log("curso", alumno)
-    alumnoService.actualizarAlumno(alumno).then((res) => {
+    // El id sale del alumno que se eligio por legajo
+    alumnoService.actualizarAlumno(alumnoData._id, values).then((res) => {
         console.log('Alumno modificado exitosamente:', res);
         setSuccess('Alumno modificado exitosamente.');
-        
+
             form.resetFields();
-        
+            setAlumnoData(null);
+            cargarDatosIniciales();
+
             setTimeout(() => {
                 setSuccess(null);
             }, 2000);

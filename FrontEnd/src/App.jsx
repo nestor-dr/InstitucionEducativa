@@ -13,6 +13,11 @@ import ListadoCurso from './modules/ListadoCurso'
 import CrearCurso from './modules/CrearCurso'
 import ModificarCurso from './modules/ModificarCurso'
 
+import ListadoMaterias from './modules/ListadoMaterias'
+import FormularioMateria from './modules/FormularioMateria'
+import ListadoAnios from './modules/ListadoAnios'
+import FormularioAnio from './modules/FormularioAnio'
+
 import CrearBoletin from './modules/CrearBoletin'
 import ListadoBoletines from './modules/ListadoBoletines'
 import EditarBoletin from './modules/EditarBoletin'
@@ -41,6 +46,16 @@ function App() {
                   <Route path="Listado" element={<ListadoCurso />} />
                   <Route path="Crear" element={<CrearCurso />} />
                   <Route path="Modificar" element={<ModificarCurso />} />
+                </Route>
+                <Route path="Materias">
+                  <Route path="Listado" element={<ListadoMaterias />} />
+                  <Route path="Crear" element={<FormularioMateria />} />
+                  <Route path="Modificar/:id" element={<FormularioMateria />} />
+                </Route>
+                <Route path="Anios">
+                  <Route path="Listado" element={<ListadoAnios />} />
+                  <Route path="Crear" element={<FormularioAnio />} />
+                  <Route path="Modificar/:id" element={<FormularioAnio />} />
                 </Route>
               </Route>
               {/* Solo profesor */}

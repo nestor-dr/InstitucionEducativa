@@ -71,7 +71,7 @@ function onListening() {
 // Prints the app title and more specifications
 function printTitle() {
   process.stdout.write('\n')
-  process.stdout.write(`${figlet.textSync(`Base API`, { font: 'Ogre' })}\n`)
+  process.stdout.write(`${figlet.textSync(`Institucion Educativa`, { font: 'Small' })}\n`)
   process.stdout.write('\n')
   process.stdout.write(
     `Version: ${pkg.version}, Environment: ${process.env.NODE_ENV || 'default'}\n`,
