@@ -10,6 +10,7 @@ El sistema tiene tres roles que se loguean, y cada uno ve un menú distinto.
 - Da de alta, modifica, lista y elimina **alumnos**, y los asigna a un curso (comisión).
 - Administra los **cursos**: cada curso pertenece a un año y tiene asignadas sus materias.
 - Administra las **materias** y los **años**, así no dependen solo de la migración inicial.
+- Administra los **usuarios**: los da de alta (admin, profesor o alumno, y en ese caso a qué alumno corresponde), les cambia los datos y el rol, les resetea la contraseña y los elimina. No se puede borrar ni sacarse el rol de admin a sí mismo, así el sistema nunca queda sin administrador.
 
 **Profesor**
 - Genera el **boletín de calificaciones** de un alumno, cargando la nota (de 1 a 10) de cada materia del curso al que pertenece.
@@ -111,7 +112,7 @@ La terminal va a mostrar algo como `Local: http://localhost:5173/`. Abrilo en el
 
 # Usuarios de prueba
 
-Los carga la migración inicial.
+Los carga la migración inicial. Los usuarios nuevos se crean desde el menú Usuarios (admin); la contraseña tiene que tener al menos 8 caracteres, con letras y números.
 
 | Rol | Email | Contraseña |
 |---|---|---|
@@ -133,6 +134,7 @@ Con el profesor ya hay dos boletines cargados (Nestor del Rio y Juan Perez). Mar
 | `/Cursos/Listado`, `/Cursos/Crear`, `/Cursos/Modificar` | admin | ABM de cursos |
 | `/Materias/Listado`, `/Materias/Crear`, `/Materias/Modificar/:id` | admin | ABM de materias |
 | `/Anios/Listado`, `/Anios/Crear`, `/Anios/Modificar/:id` | admin | ABM de años |
+| `/Usuarios/Listado`, `/Usuarios/Crear`, `/Usuarios/Modificar` | admin | ABM de usuarios (rol, alumno vinculado y reseteo de contraseña) |
 | `/Boletines/Listado` | profesor | Listado de boletines con su promedio |
 | `/Boletines/Crear` | profesor | Generar el boletín de un alumno |
 | `/Boletines/Ver/:id` | profesor | Ver e imprimir un boletín |

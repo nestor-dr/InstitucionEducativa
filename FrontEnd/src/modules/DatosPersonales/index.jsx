@@ -4,6 +4,7 @@ import { Container, Grid, Paper, Typography } from '@mui/material';
 import { Form, Input, Button, Alert, Divider } from 'antd';
 
 import usuarioService from '../../services/Usuario/usuarioapi';
+import { reglaPassword } from '../../utils/validaciones';
 
 const DatosPersonales = () => {
   const navigate = useNavigate();
@@ -83,7 +84,7 @@ const DatosPersonales = () => {
               </Form.Item>
             </Grid>
             <Grid item xs={6}>
-              <Form.Item label="Contraseña nueva (opcional)" name="password" rules={[{ min: 6, message: 'Mínimo 6 caracteres' }]}>
+              <Form.Item label="Contraseña nueva (opcional)" name="password" rules={[reglaPassword]}>
                 <Input.Password autoComplete="new-password" />
               </Form.Item>
             </Grid>

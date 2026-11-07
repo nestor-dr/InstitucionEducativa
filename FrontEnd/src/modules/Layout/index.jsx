@@ -16,6 +16,7 @@ import {
   FileAddOutlined,
   BookOutlined,
   CalendarOutlined,
+  SafetyCertificateOutlined,
   IdcardOutlined,
   LogoutOutlined,
   DownOutlined,
@@ -56,6 +57,11 @@ function armarMenu(rol) {
       ]),
       getItem(<Link to="/Materias/Listado"> Materias </Link>, '/Materias/Listado', <BookOutlined />),
       getItem(<Link to="/Anios/Listado"> Años </Link>, '/Anios/Listado', <CalendarOutlined />),
+      getItem('Usuarios', 'usuarios', <SafetyCertificateOutlined />, [
+        getItem(<Link to="/Usuarios/Listado"> Listado de Usuarios </Link>, '/Usuarios/Listado', <SolutionOutlined />),
+        getItem(<Link to="/Usuarios/Crear"> Alta de Usuario </Link>, '/Usuarios/Crear', <UserAddOutlined />),
+        getItem(<Link to="/Usuarios/Modificar"> Modificar Usuario </Link>, '/Usuarios/Modificar', <UserSwitchOutlined />),
+      ]),
       datosPersonales,
     ];
   }

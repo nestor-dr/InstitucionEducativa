@@ -13,6 +13,14 @@ const usuarioSchema = new Schema({
   password: { type: String, required: true, select: false},
   rol:      { type: ObjectId, ref: 'Roles', required: true},
   alumno:   { type: ObjectId, ref: 'Alumno' } // Solo para el rol alumno: a que alumno corresponde
+}, {
+  // La contraseña (aunque este hasheada) nunca sale en una respuesta
+  toJSON: {
+    transform: (doc, usuario) => {
+      delete usuario.password
+      return usuario
+    },
+  },
 })
 
 usuarioSchema.method('checkPassword', async function checkPassword(potentialPassword) {

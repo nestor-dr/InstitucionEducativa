@@ -16,9 +16,17 @@ router.put('/:id', permitirRoles('admin'), actualizarAlumno)
 router.delete('/:id', permitirRoles('admin'), borrarAlumno)
 
 //Obtiene todos los alumnos existentes
+// Con ?sinUsuario=true trae solo los que todavia no tienen usuario (para vincular un usuario alumno)
+// y con &incluir=<id> suma ese alumno aunque ya tenga usuario (el vinculado al usuario que se edita)
 async function obtenerTodosAlumnos(req, res, next) {
   try {
-    const alumnos = await Alumno.find().populate('curso')
+    const filtro = {}
+    if (req.query.sinUsuario === 'true') {
+      const vinculados = await Usuario.distinct('alumno', { alumno: { $ne: null } })
+      filtro._id = { $nin: vinculados.filter((id) => String(id) !== req.query.incluir) }
+    }
+
+    const alumnos = await Alumno.find(filtro).populate('curso').sort({ apellido: 1, nombre: 1 }).collation({ locale: 'es' })
     res.send(alumnos)
   } catch (err) {
     next(err)

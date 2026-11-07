@@ -18,6 +18,10 @@ import FormularioMateria from './modules/FormularioMateria'
 import ListadoAnios from './modules/ListadoAnios'
 import FormularioAnio from './modules/FormularioAnio'
 
+import ListadoUsuarios from './modules/ListadoUsuarios'
+import CrearUsuario from './modules/CrearUsuario'
+import ModificarUsuario from './modules/ModificarUsuario'
+
 import CrearBoletin from './modules/CrearBoletin'
 import ListadoBoletines from './modules/ListadoBoletines'
 import EditarBoletin from './modules/EditarBoletin'
@@ -57,6 +61,12 @@ function App() {
                   <Route path="Listado" element={<ListadoAnios />} />
                   <Route path="Crear" element={<FormularioAnio />} />
                   <Route path="Modificar/:id" element={<FormularioAnio />} />
+                </Route>
+                <Route path="Usuarios">
+                  <Route path="Listado" element={<ListadoUsuarios />} />
+                  <Route path="Crear" element={<CrearUsuario />} />
+                  <Route path="Modificar" element={<ModificarUsuario />} />
+                  <Route path="Modificar/:id" element={<ModificarUsuario />} />
                 </Route>
               </Route>
               {/* Solo profesor */}
