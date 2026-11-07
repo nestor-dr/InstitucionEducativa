@@ -36,7 +36,7 @@ export default function VerBoletin() {
           description={error}
           type="error"
           showIcon
-          style={{ position: 'fixed', bottom: 20, right: 20 }}
+          style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
         />
         <Button type="primary" onClick={() => navigate('/Boletines/Listado')}>Volver al listado</Button>
       </div>

@@ -47,7 +47,7 @@ const ModificarAlumno = () => {
   
         const nombresMaterias = res.materias.map(materia => materia._id);
 
-        const Anio = (res.anio == null) ? '' : res.anio._id;
+        const Anio = (res.anio == null) ? undefined : res.anio._id;
 
         // Aquí, estableces los campos del formulario después de que se resuelva la promesa
         form.setFieldsValue({
@@ -135,7 +135,7 @@ const ModificarAlumno = () => {
                 showIcon
                 closable
                 onClose={() => setError(null)} // Limpiar el estado de error al cerrar la alerta
-                style={{ position: 'fixed', bottom: 20, right: 20 }}
+                style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
             />
         )}
 
@@ -145,7 +145,7 @@ const ModificarAlumno = () => {
                 description={success}
                 type="success"
                 showIcon
-                style={{ position: 'fixed', bottom: 20, right: 20 }}
+                style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
             />
         )}
       <Form
@@ -174,9 +174,10 @@ const ModificarAlumno = () => {
 
             {/* Segunda Columna */}
             <Col span={12}>           
-                <Form.Item label="Materias" name="materias" rules={[{ required: true, message: 'Seleccione las materias' }]}>
+                <Form.Item label="Materias" name="materias" rules={[{ required: true, message: 'Seleccione al menos una materia' }]}>
                     <Select 
                     mode="multiple"
+                    optionFilterProp="children"
                     dropdownStyle={{ width: '16%' }}
                     style= {{width: '120%' }}
                     onChange = {materiaseleccion}
@@ -193,9 +194,11 @@ const ModificarAlumno = () => {
 
             {/* Tercera Columna */}
             <Col span={12}>
-            <Form.Item label="Año" name="anio" rules={[{ message: 'Seleccione el año' }]}>
+            <Form.Item label="Año" name="anio">
                     <Select 
                         dropdownStyle={{ width: '11%' }}
+                        allowClear
+                        placeholder="Sin año"
                     >
                         {anios.map((anio) => (
                         <Option key={anio._id} value={anio._id}>

@@ -7,6 +7,7 @@ const Curso = require('../schemas/curso')
 const router = express.Router()
 
 router.get('/', obtenerTodosBoletines)
+router.get('/alumno/:id', obtenerBoletinesDeAlumno)
 router.get('/:id', obtenerBoletinPorId)
 router.post('/', crearBoletin)
 router.put('/:id', actualizarBoletin)
@@ -66,6 +67,16 @@ function validarNotas(notas, curso) {
 async function obtenerTodosBoletines(req, res, next) {
   try {
     const boletines = await completarBoletin(Boletin.find().sort({ createdAt: -1 }))
+    res.send(boletines)
+  } catch (err) {
+    next(err)
+  }
+}
+
+// Obtiene los boletines de un alumno (para saber si ya tiene uno antes de crear otro)
+async function obtenerBoletinesDeAlumno(req, res, next) {
+  try {
+    const boletines = await Boletin.find({ alumno: req.params.id }).populate('curso')
     res.send(boletines)
   } catch (err) {
     next(err)

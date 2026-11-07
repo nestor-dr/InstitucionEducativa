@@ -41,10 +41,10 @@ const DatosPersonales = () => {
   return (
     <Container maxWidth="md">
       {error && (
-        <Alert message="Error" description={error} type="error" showIcon closable onClose={() => setError(null)} style={{ position: 'fixed', bottom: 20, right: 20 }} />
+        <Alert message="Error" description={error} type="error" showIcon closable onClose={() => setError(null)} style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }} />
       )}
       {success && (
-        <Alert message="Éxito" description={success} type="success" showIcon style={{ position: 'fixed', bottom: 20, right: 20 }} />
+        <Alert message="Éxito" description={success} type="success" showIcon style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }} />
       )}
 
       <Paper style={{ padding: '20px', backgroundColor: 'rgba(255, 255, 255, 0.9)' }}>
@@ -74,12 +74,12 @@ const DatosPersonales = () => {
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Form.Item label="Nombre" name="nombre" rules={[{ required: true, whitespace: true, message: 'Ingrese el nombre' }]}>
-                <Input />
+                <Input autoComplete="given-name" />
               </Form.Item>
             </Grid>
             <Grid item xs={6}>
               <Form.Item label="Apellido" name="apellido" rules={[{ required: true, whitespace: true, message: 'Ingrese el apellido' }]}>
-                <Input />
+                <Input autoComplete="family-name" />
               </Form.Item>
             </Grid>
             <Grid item xs={6}>

@@ -84,6 +84,7 @@ export default function ListadoBoletines() {
     boletinService.obtenerBoletines()
       .then((res) => setBoletines(res))
       .catch((error) => {
+        setBoletines([]);
         setError(error.mensaje);
         setTimeout(() => setError(null), 2000);
       });
@@ -132,7 +133,7 @@ export default function ListadoBoletines() {
           showIcon
           closable
           onClose={() => setError(null)}
-          style={{ position: 'fixed', bottom: 20, right: 20 }}
+          style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
         />
       )}
 
@@ -142,7 +143,7 @@ export default function ListadoBoletines() {
           description={success}
           type="success"
           showIcon
-          style={{ position: 'fixed', bottom: 20, right: 20 }}
+          style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
         />
       )}
 

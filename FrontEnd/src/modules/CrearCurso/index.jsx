@@ -106,7 +106,7 @@ export default function CrearAlumno() {
                     showIcon
                     closable
                     onClose={() => setError(null)} // Limpiar el estado de error al cerrar la alerta
-                    style={{ position: 'fixed', bottom: 20, right: 20 }}
+                    style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
                 />
             )}
 
@@ -116,7 +116,7 @@ export default function CrearAlumno() {
                     description={success}
                     type="success"
                     showIcon
-                    style={{ position: 'fixed', bottom: 20, right: 20 }}
+                    style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
                 />
             )}
 
@@ -137,9 +137,10 @@ export default function CrearAlumno() {
 
                     {/* Segunda Columna */}
                     <Col span={12}>           
-                        <Form.Item label="Materias" name="materias" rules={[{ message: 'Seleccione las materias' }]}>
+                        <Form.Item label="Materias" name="materias" rules={[{ required: true, message: 'Seleccione al menos una materia' }]}>
                             <Select 
                                 mode="multiple"
+                    optionFilterProp="children"
                                 dropdownStyle={{ width: '16%' }}
                                 style= {{width: '120%' }}
                                 onChange = {materiaseleccion}
@@ -157,8 +158,8 @@ export default function CrearAlumno() {
 
                     {/* Tercera Columna */}
                     <Col span={12}>
-                        <Form.Item label="Año" name="anio" rules={[{ message: 'Seleccione el año' }]}>
-                            <Select dropdownStyle={{ width: '11%' }}>
+                        <Form.Item label="Año" name="anio">
+                            <Select dropdownStyle={{ width: '11%' }} allowClear placeholder="Sin año">
                                 {anios.map((anio) => (
                                     <Option key={anio._id} value={anio._id}>
                                         {anio.nombre}

@@ -71,7 +71,7 @@ export default function SignInSide() {
                 showIcon
                 closable
                 onClose={() => setError(null)} // Limpiar el estado de error al cerrar la alerta
-                style={{ position: 'fixed', bottom: 20, right: 20 }}
+                style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
             />
         )}
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>

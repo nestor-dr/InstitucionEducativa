@@ -36,7 +36,7 @@ api.interceptors.response.use(
     } else if (data && data.mensaje) {
       error.mensaje = data.mensaje
     } else if (!error.response) {
-      error.mensaje = 'No se pudo conectar con el servidor'
+      error.mensaje = 'No se puede conectar con el servidor. Intentá de nuevo más tarde.'
     } else {
       error.mensaje = 'Ocurrió un error inesperado'
     }

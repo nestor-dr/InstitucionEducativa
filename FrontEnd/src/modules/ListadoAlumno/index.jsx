@@ -96,7 +96,7 @@ export default function ListadoAlumno() {
   const [alumnos, setAlumnos] = useState([])
 
   useEffect(() => {
-    alumnoService.obtenerAlumnos().then(res => {setAlumnos(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);})
+    alumnoService.obtenerAlumnos().then(res => {setAlumnos(res);}).catch((error) => {setAlumnos([]); setError(error.mensaje); setTimeout(() => setError(null), 2000);})
   }, [])
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - alumnos.length) : 0;
@@ -150,7 +150,7 @@ export default function ListadoAlumno() {
             showIcon
             closable
             onClose={() => setError(null)}
-            style={{ position: 'fixed', bottom: 20, right: 20 }}
+            style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
           />
         )}
 
@@ -160,7 +160,7 @@ export default function ListadoAlumno() {
             description={success}
             type="success"
             showIcon
-            style={{ position: 'fixed', bottom: 20, right: 20 }}
+            style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
           />
         )}
 

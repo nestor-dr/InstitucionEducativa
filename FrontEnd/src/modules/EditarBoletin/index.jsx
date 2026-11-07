@@ -8,6 +8,12 @@ import boletinService from '../../services/Boletin/boletinapi';
 
 const { Title, Text } = Typography;
 
+// Regla de cada nota: obligatoria y entre 1 y 10 (no se corrige sola, se marca en rojo)
+const reglasNota = [
+  { required: true, message: 'Ingrese la nota' },
+  { type: 'number', min: 1, max: 10, message: 'La nota tiene que estar entre 1 y 10' },
+];
+
 export default function EditarBoletin() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -35,7 +41,7 @@ export default function EditarBoletin() {
     return (
       <Container style={{ padding: '40px', textAlign: 'center' }}>
         {error && (
-          <Alert message="Error" description={error} type="error" showIcon style={{ position: 'fixed', bottom: 20, right: 20 }} />
+          <Alert message="Error" description={error} type="error" showIcon style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }} />
         )}
         <Title level={3}>{error ? 'No se encontró el boletín a editar.' : 'Cargando boletín...'}</Title>
         <Button type="primary" onClick={() => navigate('/Boletines/Listado')}>
@@ -47,6 +53,11 @@ export default function EditarBoletin() {
 
   // Se editan las materias que tiene hoy el curso
   const materias = boletin.curso ? boletin.curso.materias : [];
+
+  // Si al curso le cambiaron las materias despues de crear el boletin, se avisa
+  const idsBoletin = boletin.notas.filter((item) => item.materia).map((item) => item.materia._id).sort().join();
+  const idsCurso = materias.map((materia) => materia._id).sort().join();
+  const cambiaronMaterias = idsBoletin !== idsCurso;
 
   const onFinish = (values) => {
     const notas = materias.map((materia) => ({ materia: materia._id, nota: values.notas[materia._id] }));
@@ -96,7 +107,7 @@ export default function EditarBoletin() {
           showIcon
           closable
           onClose={() => setError(null)}
-          style={{ position: 'fixed', bottom: 20, right: 20 }}
+          style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
         />
       )}
 
@@ -106,7 +117,17 @@ export default function EditarBoletin() {
           description={success}
           type="success"
           showIcon
-          style={{ position: 'fixed', bottom: 20, right: 20 }}
+          style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
+        />
+      )}
+
+      {cambiaronMaterias && (
+        <Alert
+          type="info"
+          showIcon
+          message="Las materias del curso cambiaron desde que se creó este boletín"
+          description="Al guardar, el boletín queda con las materias que tiene hoy el curso: completá las que falten (las que se sacaron del curso dejan de figurar)."
+          style={{ marginBottom: '20px', width: '100%' }}
         />
       )}
 
@@ -114,10 +135,12 @@ export default function EditarBoletin() {
         form={form}
         name="EditarBoletin"
         onFinish={onFinish}
-        labelCol={{ span: 8 }}
-        wrapperCol={{ span: 50 }}
+        labelCol={{ flex: '70px' }}
+        labelAlign="left"
+        wrapperCol={{ flex: 1 }}
+        style={{ width: '100%' }}
       >
-        <Row gutter={100}>
+        <Row gutter={60}>
           <Col span={12}>
             <Form.Item label="Alumno">
               <Input
@@ -143,9 +166,9 @@ export default function EditarBoletin() {
                   <Col span={10}>
                     <Form.Item
                       name={['notas', materia._id]}
-                      rules={[{ required: true, message: 'Ingrese la nota' }, { type: 'number', min: 1, max: 10, message: 'Entre 1 y 10' }]}
+                      rules={reglasNota}
                     >
-                      <InputNumber min={1} max={10} step={0.5} placeholder="1 a 10" style={{ width: '100%' }} />
+                      <InputNumber step={0.5} placeholder="1 a 10" style={{ width: '100%' }} />
                     </Form.Item>
                   </Col>
                 </Row>
@@ -158,7 +181,7 @@ export default function EditarBoletin() {
           Los campos con * son obligatorios. Las notas van de 1 a 10.
         </Text>
 
-        <Form.Item wrapperCol={{ offset: 14, span: 16 }}>
+        <Form.Item style={{ textAlign: 'right' }}>
           <Button
             style={{ marginRight: '10px', borderRadius: '5px' }}
             onClick={() => navigate('/Boletines/Listado')}

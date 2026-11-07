@@ -7,5 +7,6 @@ boletinService.eliminarBoletin = async (boletinId) => {return await api.delete(`
 boletinService.actualizarBoletin = async (boletinId, notas) => {return await api.put(`/boletines/${boletinId}`, { notas })}
 boletinService.obtenerBoletines = async () => {return await api.get('/boletines')};
 boletinService.obtenerBoletin = async (boletinId) => {return await api.get(`/boletines/${boletinId}`)};
+boletinService.obtenerBoletinesDeAlumno = async (alumnoId) => {return await api.get(`/boletines/alumno/${alumnoId}`)};
 
 export default boletinService

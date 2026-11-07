@@ -43,7 +43,7 @@ export default function ListadoAnios() {
   useEffect(() => {
     anioService.obtenerAnios()
       .then((res) => setAnios(res))
-      .catch((error) => mostrarMensaje(setError, error.mensaje));
+      .catch((error) => { setAnios([]); mostrarMensaje(setError, error.mensaje); });
   }, []);
 
   // Borra el año (el back no deja si un curso lo usa)
@@ -63,10 +63,10 @@ export default function ListadoAnios() {
       </Typography>
 
       {error && (
-        <Alert message="Error" description={error} type="error" showIcon closable onClose={() => setError(null)} style={{ position: 'fixed', bottom: 20, right: 20 }} />
+        <Alert message="Error" description={error} type="error" showIcon closable onClose={() => setError(null)} style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }} />
       )}
       {success && (
-        <Alert message="Éxito" description={success} type="success" showIcon style={{ position: 'fixed', bottom: 20, right: 20 }} />
+        <Alert message="Éxito" description={success} type="success" showIcon style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }} />
       )}
 
       <Button style={estiloBoton('#0958d9')} onClick={() => navigate('/Anios/Crear')}>

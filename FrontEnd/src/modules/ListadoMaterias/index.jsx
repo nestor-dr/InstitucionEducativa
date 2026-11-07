@@ -43,7 +43,7 @@ export default function ListadoMaterias() {
   useEffect(() => {
     materiaService.obtenerMaterias()
       .then((res) => setMaterias(res))
-      .catch((error) => mostrarMensaje(setError, error.mensaje));
+      .catch((error) => { setMaterias([]); mostrarMensaje(setError, error.mensaje); });
   }, []);
 
   // Borra la materia (el back no deja si esta asignada a un curso)
@@ -63,10 +63,10 @@ export default function ListadoMaterias() {
       </Typography>
 
       {error && (
-        <Alert message="Error" description={error} type="error" showIcon closable onClose={() => setError(null)} style={{ position: 'fixed', bottom: 20, right: 20 }} />
+        <Alert message="Error" description={error} type="error" showIcon closable onClose={() => setError(null)} style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }} />
       )}
       {success && (
-        <Alert message="Éxito" description={success} type="success" showIcon style={{ position: 'fixed', bottom: 20, right: 20 }} />
+        <Alert message="Éxito" description={success} type="success" showIcon style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }} />
       )}
 
       <Button style={estiloBoton('#0958d9')} onClick={() => navigate('/Materias/Crear')}>

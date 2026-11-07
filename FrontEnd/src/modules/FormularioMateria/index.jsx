@@ -61,10 +61,10 @@ export default function FormularioMateria() {
       <BookOutlined style={{ fontSize: '50px', marginBottom: '20px' }} />
 
       {error && (
-        <Alert message="Error" description={error} type="error" showIcon closable onClose={() => setError(null)} style={{ position: 'fixed', bottom: 20, right: 20 }} />
+        <Alert message="Error" description={error} type="error" showIcon closable onClose={() => setError(null)} style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }} />
       )}
       {success && (
-        <Alert message="Éxito" description={success} type="success" showIcon style={{ position: 'fixed', bottom: 20, right: 20 }} />
+        <Alert message="Éxito" description={success} type="success" showIcon style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }} />
       )}
 
       <Form form={form} name="FormularioMateria" onFinish={onFinish} style={{ width: '100%' }} layout="vertical">

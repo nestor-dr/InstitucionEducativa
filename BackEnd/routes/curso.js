@@ -46,22 +46,54 @@ async function obtenerCursoPorId(req, res, next) {
     }
   }
 
+// Valida los datos de un curso (al crear y al modificar)
+// Devuelve el mensaje de error o null si esta todo bien. Deja req.body listo para guardar.
+async function validarCurso(req, idActual) {
+  const nombre = (req.body.nombre || '').trim()
+  if (!nombre) {
+    return 'Ingresá el nombre del curso'
+  }
+
+  // Nombre repetido (sin importar mayusculas)
+  const repetido = await Curso.findOne({ nombre, _id: { $ne: idActual } }).collation({ locale: 'es', strength: 1 })
+  if (repetido) {
+    return 'Ya existe un curso con ese nombre'
+  }
+
+  // El año es opcional: si viene tiene que existir, si viene vacio el curso queda sin año
+  if (req.body.anio) {
+    const anio = await Anio.findById(req.body.anio)
+    if (!anio) {
+      return 'El año indicado no existe'
+    }
+  } else {
+    req.body.anio = null
+  }
+
+  // Tiene que tener al menos una materia y todas tienen que existir
+  if (!Array.isArray(req.body.materias) || req.body.materias.length === 0) {
+    return 'El curso tiene que tener al menos una materia'
+  }
+  const materias = await Materia.find({ _id: { $in: req.body.materias } })
+  if (materias.length !== req.body.materias.length) {
+    return 'Alguna de las materias indicadas no existe'
+  }
+
+  req.body.nombre = nombre
+  req.body.materias = materias.map((materia) => materia._id)
+  return null
+}
+
 // Creamos un curso a partir de los datos obtenidos
 async function crearCurso(req, res, next) {
-  
-    const curso = req.body
-
     try {
-      const anio = (curso.anio == null) ? '' : await Anio.findOne({ _id: curso.anio });
-
-      if (anio === null) {
-        return res.status(400).send('El año indicado no existe')
+      const errorCurso = await validarCurso(req)
+      if (errorCurso) {
+        return res.status(400).send(errorCurso)
       }
 
-      const materias = (curso.materias == null) ? '' : await Materia.find({ _id: { $in: curso.materias } });
-    
-      const cursoCreado = await Curso.create({...curso, anio: anio._id, ...(materias !== '') && { materias: materias.map((materia) => materia._id) }});   
-      res.send(cursoCreado)
+      const cursoCreado = await Curso.create({ nombre: req.body.nombre, anio: req.body.anio, materias: req.body.materias })
+      res.status(201).send(cursoCreado)
     } catch (err) {
       next(err)
     }
@@ -76,23 +108,9 @@ async function actualizarCurso(req, res, next) {
         return res.status(404).send('Curso no encontrado')
       }
 
-      // Si viene un año tiene que existir; si viene vacio el curso queda sin año
-      if (req.body.anio) {
-        const anio = await Anio.findById(req.body.anio)
-        if (!anio) {
-          return res.status(400).send('El año indicado no existe')
-        }
-      } else {
-        req.body.anio = null
-      }
-
-      if (req.body.materias) {
-        // Todas las materias elegidas tienen que existir
-        const materias = await Materia.find({ _id: { $in: req.body.materias } })
-        if (materias.length !== req.body.materias.length) {
-          return res.status(400).send('Alguna de las materias indicadas no existe')
-        }
-        req.body.materias = materias.map((materia) => materia._id)
+      const errorCurso = await validarCurso(req, cursoParaActualizar._id)
+      if (errorCurso) {
+        return res.status(400).send(errorCurso)
       }
 
       // Devuelve el curso ya actualizado

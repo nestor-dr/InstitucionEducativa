@@ -123,7 +123,7 @@ const ModificarAlumno = () => {
                 showIcon
                 closable
                 onClose={() => setError(null)} // Limpiar el estado de error al cerrar la alerta
-                style={{ position: 'fixed', bottom: 20, right: 20 }}
+                style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
             />
         )}
 
@@ -133,7 +133,7 @@ const ModificarAlumno = () => {
                 description={success}
                 type="success"
                 showIcon
-                style={{ position: 'fixed', bottom: 20, right: 20 }}
+                style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
             />
         )}
       <Form

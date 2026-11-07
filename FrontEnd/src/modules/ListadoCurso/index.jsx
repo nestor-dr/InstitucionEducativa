@@ -97,7 +97,7 @@ export default function ListadoCurso() {
   const [success, setSuccess] = useState(null);
 
   useEffect(() => {
-    cursoService.obtenerCursos().then(res => {setCursos(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);})
+    cursoService.obtenerCursos().then(res => {setCursos(res);}).catch((error) => {setCursos([]); setError(error.mensaje); setTimeout(() => setError(null), 2000);})
     }, [])
 
   const emptyRows =
@@ -155,7 +155,7 @@ export default function ListadoCurso() {
             showIcon
             closable
             onClose={() => setError(null)}
-            style={{ position: 'fixed', bottom: 20, right: 20 }}
+            style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
           />
         )}
 
@@ -165,7 +165,7 @@ export default function ListadoCurso() {
             description={success}
             type="success"
             showIcon
-            style={{ position: 'fixed', bottom: 20, right: 20 }}
+            style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
           />
         )}
        <TableContainer component={Paper}>
