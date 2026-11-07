@@ -35,7 +35,7 @@ export default function SignInSide() {
       window.location.href= 'Inicio';
       }).catch((error) => {
             console.error('Error al Loguearse:', error);
-            setError('Error al loguarse. EL mail o la contraseña no son correctas');
+            setError(error.mensaje);
 
             setTimeout(() => {
                 setError(null);

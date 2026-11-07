@@ -4,28 +4,45 @@ const api = axios.create({
   // URL del back tomada de FrontEnd/.env
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 1000 * 15, // 15 sec
-  // headers: {
-  //   Accept: 'application/json',
-  //   'Content-Type': 'application/json',
-  // },
 })
 
+// Antes de cada pedido agrega el token guardado al loguearse
 api.interceptors.request.use(
   (config) => {
-    // const data = localStorage.get() // Before request is sent
-    // if (data) {
-    //   config.headers.common.Authorization = `${data.token}`
-    // }
+    const usuario = JSON.parse(localStorage.getItem('usuario'))
+    if (usuario && usuario.token) {
+      config.headers.Authorization = `Bearer ${usuario.token}`
+    }
     return config
   },
-  (error) => Promise.reject(error) // Do something with request error
+  (error) => Promise.reject(error)
 )
 
 api.interceptors.response.use(
-  (response) => response.data, // Do something with response data
-  (error) =>
-    // Do something with response error
-    Promise.reject(console.log(error))
+  (response) => response.data,
+  (error) => {
+    const status = error.response ? error.response.status : null
+
+    // Token vencido o invalido: se cierra la sesion y vuelve al login
+    if (status === 401 && localStorage.getItem('usuario')) {
+      localStorage.clear()
+      window.location.href = '/'
+    }
+
+    // Deja en error.mensaje el texto que mando el back para mostrarlo en pantalla
+    const data = error.response ? error.response.data : null
+    if (typeof data === 'string' && data && !data.startsWith('<')) {
+      error.mensaje = data
+    } else if (data && data.mensaje) {
+      error.mensaje = data.mensaje
+    } else if (!error.response) {
+      error.mensaje = 'No se pudo conectar con el servidor'
+    } else {
+      error.mensaje = 'Ocurrió un error inesperado'
+    }
+
+    return Promise.reject(error)
+  }
 )
 
 export default api

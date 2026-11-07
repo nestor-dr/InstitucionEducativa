@@ -1,13 +1,14 @@
-function authorization(req, res, next) {
-    req.isAdmin = function isAdmin() {
-      return req.user && req.user.role === 'admin'
+const createError = require('http-errors')
+
+// Deja pasar solo a los usuarios que tengan alguno de los roles indicados
+// Ej: router.post('/', permitirRoles('admin'), crearAlumno)
+function permitirRoles(...roles) {
+  return function (req, res, next) {
+    if (!req.user || !roles.includes(req.user.rol)) {
+      return next(new createError.Forbidden('No tenés permiso para realizar esta acción'))
     }
-  
-    req.isClient = function isClient() {
-      return req.user && req.user.role === 'profesor'
-    }
-  
-    return next(null)
+    next()
   }
-  
-  module.exports = authorization
+}
+
+module.exports = permitirRoles

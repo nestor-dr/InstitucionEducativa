@@ -1,61 +1,34 @@
 const jwt = require('jsonwebtoken')
 const createError = require('http-errors')
-// const fs = require('fs')
-// const path = require('path')
 
-/* eslint-disable-next-line no-undef */
-// const publicKey = fs.readFileSync(path.join(__dirname, `../keys/base-api-express-generator.pub`))
-
-function getToken(req, next) {
-  const TOKEN_REGEX = /^\s*Bearer\s+(\S+)/g
-  const matches = TOKEN_REGEX.exec(req.headers.authorization)
-
-  if (!matches) {
-    return next(new createError.Unauthorized())
-  }
-
-  const [, token] = matches
-  return token
+// Saca el token del header "Authorization: Bearer <token>"
+function obtenerToken(req) {
+  const [tipo, token] = (req.headers.authorization || '').split(' ')
+  return tipo === 'Bearer' && token ? token : null
 }
 
+// Verifica el token y deja los datos del usuario en req.user
 function authentication(req, res, next) {
-  if (!req.headers.authorization) {
-    console.error('Missing authorization header')
-    return next(new createError.Unauthorized())
+  const token = obtenerToken(req)
+
+  if (!token) {
+    return next(new createError.Unauthorized('Falta el token de acceso'))
   }
 
-  const token = getToken(req, next)
-
   try {
-    // Unsecure alternative
-    req.user = jwt.verify(token, 'backend', {
-      issuer: 'base-api-express-generator',
-    })
+    /* eslint-disable-next-line no-undef */
+    req.user = jwt.verify(token, process.env.JWT_SECRET, { issuer: process.env.JWT_ISSUER })
 
-    // Correct alternative
-    // req.user = jwt.verify(token, publicKey, {
-    //   algorithms: ['RS256'],
-    //   issuer: 'base-api-express-generator',
-    // })
-
-    if (!req.user || !req.user._id || !req.user.role) {
-      console.error('Error authenticating malformed JWT')
-      return next(new createError.Unauthorized())
+    if (!req.user._id || !req.user.rol) {
+      return next(new createError.Unauthorized('Token mal formado'))
     }
 
-    console.info(`User ${req.user._id} authenticated`)
-
-    next(null)
+    next()
   } catch (err) {
-    if (err.message === 'invalid algorithm' || err.message === 'invalid signature') {
-      const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
-      console.error(`Suspicious access attempt from ip=${ip} ${token}`)
-    }
     if (err.name === 'TokenExpiredError') {
-      console.error('Expired token, sending 401 to client')
-      return res.sendStatus(401)
+      return next(new createError.Unauthorized('La sesión expiró, volvé a iniciar sesión'))
     }
-    return next(new createError.Unauthorized(err))
+    return next(new createError.Unauthorized('Token inválido'))
   }
 }
 

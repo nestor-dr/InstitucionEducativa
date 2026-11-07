@@ -12,7 +12,7 @@ const anioRouter = require('./routes/anio')
 const materiaRouter = require('./routes/materia')
 const boletinRouter = require('./routes/boletin')
 const authentication = require('./middlewares/authentication')
-const authorization = require('./middlewares/authorization')
+const permitirRoles = require('./middlewares/authorization')
 
 const app = express()
 
@@ -21,18 +21,22 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use(authorization)
 
 // This is to aviod error
 app.get('/favicon.ico', (req, res) => res.status(204))
 
+// Rutas publicas
 app.use('/', statusRouter)
 app.use('/auth', authRouter)
+
+// Rutas que necesitan estar logueado (el control por rol esta en cada router)
 app.use('/usuarios', authentication, usuarioRouter)
-app.use('/alumnos', alumnoRouter)
-app.use('/cursos', cursoRouter)
-app.use('/boletines', boletinRouter)
-app.use('/anios', anioRouter)
-app.use('/materias', materiaRouter)
+app.use('/alumnos', authentication, alumnoRouter)
+app.use('/cursos', authentication, cursoRouter)
+app.use('/anios', authentication, anioRouter)
+app.use('/materias', authentication, materiaRouter)
+
+// Los boletines son solo del profesor
+app.use('/boletines', authentication, permitirRoles('profesor'), boletinRouter)
 
 module.exports = app

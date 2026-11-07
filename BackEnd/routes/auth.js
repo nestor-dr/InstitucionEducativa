@@ -7,38 +7,25 @@ const router = new Router()
 
 router.post('/', createUserToken)
 
+// Valida email y contraseña y devuelve el token
 async function createUserToken(req, res, next) {
   console.log(`Creating user token for ${req.body.email}`)
 
-  if (!req.body.email) {
-    console.error('Missing email parameter. Sending 400 to client')
-    return res.status(400).end()
-  }
-
-  if (!req.body.password) {
-    console.error('Missing password parameter. Sending 400 to client')
-    return res.status(400).end()
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).send('Ingresá el email y la contraseña')
   }
 
   try {
-    const usuario = await Usuario.findOne({ email: req.body.email }, '+password')
+    const usuario = await Usuario.findOne({ email: req.body.email.toLowerCase().trim() }, '+password')
 
     if (!usuario) {
-      console.error('User not found. Sending 404 to client')
-      return res.status(401).end()
+      return res.status(401).send('El email o la contraseña no son correctos')
     }
 
-    console.log('Checking user password')
     const result = await usuario.checkPassword(req.body.password)
 
-    if (result.isLocked) {
-      console.error('User is locked. Sending 400 (Locked) to client')
-      return res.status(400).end()
-    }
-
     if (!result.isOk) {
-      console.error('User password is invalid. Sending 401 to client')
-      return res.status(401).end()
+      return res.status(401).send('El email o la contraseña no son correctos')
     }
 
     const response = await generateUserToken(req, usuario)

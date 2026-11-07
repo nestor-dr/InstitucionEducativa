@@ -4,13 +4,15 @@ const Alumno = require('../schemas/alumno')
 const Curso = require('../schemas/curso')
 const { ObjectId } = require('mongodb')
 
+const permitirRoles = require('../middlewares/authorization')
+
 const router = express.Router()
 
 router.get('/', obtenerTodosAlumnos)
 router.get('/:id', obtenerAlumnoPorId)
-router.post('/', crearAlumno)
-router.put('/', actualizarAlumno)
-router.delete('/:id', borrarAlumno)
+router.post('/', permitirRoles('admin'), crearAlumno)
+router.put('/', permitirRoles('admin'), actualizarAlumno)
+router.delete('/:id', permitirRoles('admin'), borrarAlumno)
 
 //Obtiene todos los alumnos existentes
 async function obtenerTodosAlumnos(req, res, next) {

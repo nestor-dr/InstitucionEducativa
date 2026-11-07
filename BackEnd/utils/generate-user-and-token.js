@@ -1,13 +1,11 @@
 const jwt = require('jsonwebtoken')
-// const fs = require('fs')
-// const path = require('path')
 
 const Rol = require('../schemas/rol')
 
+// Arma el token JWT y los datos del usuario que se devuelven al loguearse
 async function generateUserToken(req, usuario) {
   const rol = await Rol.findById(usuario.rol).exec()
-  console.log(usuario)
-  console.log(rol)
+
   const payload = {
     _id: usuario._id,
     rol: rol.descripcion,
@@ -21,20 +19,15 @@ async function generateUserToken(req, usuario) {
     apellido: usuario.apellido,
   }
 
-  /* eslint-disable-next-line no-undef */
-  // const privateKey = fs.readFileSync(path.join(__dirname, `../keys/base-api-express-generator.pem`))
-
-  // Unsecure alternative
-  const token = jwt.sign(payload, 'backend', {
+  // El secreto, el emisor y la duracion salen del .env
+  /* eslint-disable no-undef */
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
     subject: usuario._id.toString(),
-    issuer: 'backend',
+    issuer: process.env.JWT_ISSUER,
+    expiresIn: process.env.JWT_EXPIRES_IN || '8h',
   })
+  /* eslint-enable no-undef */
 
-  // const token = jwt.sign(payload, privateKey, {
-  //   subject: user._id.toString(),
-  //   issuer: 'base-api-express-generator',
-  //   algorithm: 'RS256',
-  // })
   return { token, usuario: userResponse }
 }
 

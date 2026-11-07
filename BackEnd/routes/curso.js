@@ -4,13 +4,15 @@ const Curso = require('../schemas/curso')
 const Materia = require('../schemas/materia')
 const Anio = require('../schemas/anio')
 
+const permitirRoles = require('../middlewares/authorization')
+
 const router = express.Router()
 
 router.get('/', obtenerTodosCursos)
 router.get('/:id', obtenerCursoPorId)
-router.post('/', crearCurso)
-router.put('/', actualizarCurso)
-router.delete('/:id', borrarCurso)
+router.post('/', permitirRoles('admin'), crearCurso)
+router.put('/', permitirRoles('admin'), actualizarCurso)
+router.delete('/:id', permitirRoles('admin'), borrarCurso)
 
 //Obtiene todos los cursos existentes
 async function obtenerTodosCursos(req, res, next) {
