@@ -6,6 +6,8 @@ alumnoService.crearAlumno = async (alumno) => {return await api.post('/alumnos',
 alumnoService.eliminarAlumno = async (alumnoId) => {return await api.delete(`/alumnos/${alumnoId}`)};
 alumnoService.actualizarAlumno = async (alumnoId, alumno) => {return await api.put(`/alumnos/${alumnoId}`, alumno)}
 alumnoService.obtenerAlumnos = async () => {return await api.get('/alumnos')};
+// Una pagina del listado: { pagina, limite, buscar } -> { datos, total, pagina, limite }
+alumnoService.obtenerAlumnosPaginado = async (parametros) => {return await api.get('/alumnos', { params: parametros })};
 alumnoService.obtenerAlumno = async (alumnoId) => {return await api.get(`/alumnos/${alumnoId}`)};
 // Alumnos que todavia no tienen usuario (incluir: el alumno del usuario que se esta editando)
 alumnoService.obtenerAlumnosSinUsuario = async (incluir = '') => {return await api.get('/alumnos', { params: { sinUsuario: true, incluir } })};

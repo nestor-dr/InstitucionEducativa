@@ -6,6 +6,7 @@ const Usuario = require('../schemas/usuario')
 const Rol = require('../schemas/rol')
 const Alumno = require('../schemas/alumno')
 const permitirRoles = require('../middlewares/authorization')
+const { leerPaginacion, regexBusqueda, responderListado } = require('../utils/paginacion')
 
 const router = express.Router()
 
@@ -52,10 +53,19 @@ async function validarAlumnoVinculado(alumnoId, idUsuarioActual) {
 }
 
 //Obtiene todos los usuario existentes
+// Con ?pagina=1&limite=10&buscar=texto devuelve una pagina, buscando por nombre, apellido o email
 async function obtenerTodosUsuarios(req, res, next) {
   try {
-    const usuarios = await Usuario.find().populate('rol').populate('alumno').sort({ apellido: 1, nombre: 1 }).collation({ locale: 'es' })
-    res.send(usuarios)
+    const paginacion = leerPaginacion(req.query)
+    const filtro = {}
+
+    if (paginacion.buscar) {
+      const texto = regexBusqueda(paginacion.buscar)
+      filtro.$or = [{ nombre: texto }, { apellido: texto }, { email: texto }]
+    }
+
+    const consulta = Usuario.find(filtro).populate('rol').populate('alumno').sort({ apellido: 1, nombre: 1, _id: 1 }).collation({ locale: 'es' })
+    await responderListado(res, Usuario, filtro, consulta, paginacion)
   } catch (err) {
     next(err)
   }

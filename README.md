@@ -26,6 +26,8 @@ Algunas reglas del sistema:
 - No se puede borrar un curso que tiene alumnos, ni un alumno que tiene boletines, ni una materia o año que se están usando. El sistema avisa qué hay que hacer antes.
 - Todas las rutas de la API, menos el login, piden token. Además, cada rol solo puede hacer lo suyo: si un profesor escribe a mano la URL de una pantalla del admin, vuelve al inicio.
 - El alumno ve su boletín porque el back saca de su token a qué alumno corresponde. Aunque le pegue a la API con otro id, no puede ver el boletín de nadie más.
+- Los listados de alumnos, cursos, usuarios y boletines tienen un buscador y paginación hechos en el servidor: el back recibe `?pagina=1&limite=10&buscar=texto` y devuelve solo esa página con el total (`{ datos, total, pagina, limite }`). Sin `pagina` devuelve la lista completa, que es lo que usan los selectores de los formularios.
+- En el login, "Recordarme" guarda la sesión en el navegador aunque se cierre (localStorage); si no se tilda, se borra al cerrar el navegador (sessionStorage).
 
 # Entidades y relaciones
 
@@ -76,7 +78,7 @@ npm run dev
 ```
 
 - `cp .env.example .env` crea tu archivo de configuración. En PowerShell es `Copy-Item .env.example .env`. Conviene cambiar `JWT_SECRET` por un texto largo cualquiera.
-- `npm run migrate-dev up` carga los datos iniciales (roles, usuarios, años, materias, cursos, alumnos, dos boletines de ejemplo y un usuario alumno). Para deshacerlas: `npm run migrate-dev down`, que deshace la última, así que se repite hasta vaciar. Para ver cuáles están aplicadas: `npm run migrate-dev status`.
+- `npm run migrate-dev up` carga los datos iniciales (roles, usuarios, años, materias, cursos, alumnos, dos boletines de ejemplo, un usuario alumno y 36 alumnos más para que se note la paginación). Para deshacerlas: `npm run migrate-dev down`, que deshace la última, así que se repite hasta vaciar. Para ver cuáles están aplicadas: `npm run migrate-dev status`.
 - `npm run dev` levanta la API en `http://localhost:4000`.
 
 ### 2. Front

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Alert, Popconfirm } from 'antd';
 
@@ -18,6 +18,8 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import usuarioService from '../../services/Usuario/usuarioapi';
 import CeldaTexto from '../../components/CeldaTexto';
+import CampoBusqueda from '../../components/CampoBusqueda';
+import useListadoPaginado from '../../hooks/useListadoPaginado';
 import { usuarioLogueado } from '../../services/sesion';
 
 const estiloBoton = (color) => ({
@@ -29,12 +31,12 @@ const estiloBoton = (color) => ({
 });
 
 export default function ListadoUsuarios() {
-  const [usuarios, setUsuarios] = useState([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const navigate = useNavigate();
+
+  // Busqueda y paginacion las hace el back: aca solo se pide la pagina que se ve
+  const listado = useListadoPaginado(usuarioService.obtenerUsuariosPaginado);
 
   // El usuario logueado no se puede borrar a si mismo
   const idPropio = usuarioLogueado()._id;
@@ -44,17 +46,12 @@ export default function ListadoUsuarios() {
     setTimeout(() => setMensaje(null), 2000);
   };
 
-  useEffect(() => {
-    usuarioService.obtenerUsuarios()
-      .then((res) => setUsuarios(res))
-      .catch((error) => { setUsuarios([]); mostrarMensaje(setError, error.mensaje); });
-  }, []);
-
   const eliminarUsuario = (usuario) => {
     usuarioService.eliminarUsuario(usuario._id)
       .then(() => {
-        setUsuarios((prev) => prev.filter((u) => u._id !== usuario._id));
         mostrarMensaje(setSuccess, 'Usuario eliminado exitosamente.');
+        // Se vuelve a pedir la pagina para que el total y la paginacion queden bien
+        listado.recargar();
       })
       .catch((error) => mostrarMensaje(setError, error.mensaje));
   };
@@ -65,8 +62,14 @@ export default function ListadoUsuarios() {
         Lista de Usuarios
       </Typography>
 
-      {error && (
-        <Alert message="Error" description={error} type="error" showIcon closable onClose={() => setError(null)} style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }} />
+      <CampoBusqueda
+        valor={listado.busqueda}
+        alCambiar={listado.setBusqueda}
+        placeholder="Buscar por nombre, apellido o email"
+      />
+
+      {(error || listado.error) && (
+        <Alert message="Error" description={error || listado.error} type="error" showIcon closable onClose={() => { setError(null); listado.setError(null); }} style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }} />
       )}
       {success && (
         <Alert message="Éxito" description={success} type="success" showIcon style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }} />
@@ -85,7 +88,14 @@ export default function ListadoUsuarios() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {usuarios.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((usuario) => (
+            {!listado.cargando && listado.datos.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  {listado.busqueda ? 'No hay usuarios que coincidan con la búsqueda.' : 'Todavía no hay usuarios cargados.'}
+                </TableCell>
+              </TableRow>
+            )}
+            {listado.datos.map((usuario) => (
               <TableRow key={usuario._id}>
                 <CeldaTexto texto={`${usuario.apellido}, ${usuario.nombre}`} style={{ textTransform: 'capitalize' }} />
                 <CeldaTexto texto={usuario.email} />
@@ -128,11 +138,11 @@ export default function ListadoUsuarios() {
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 colSpan={5}
-                count={usuarios.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={(event, nuevaPagina) => setPage(nuevaPagina)}
-                onRowsPerPageChange={(event) => { setRowsPerPage(parseInt(event.target.value, 10)); setPage(0); }}
+                count={listado.total}
+                rowsPerPage={listado.limite}
+                page={listado.pagina}
+                onPageChange={listado.cambiarPagina}
+                onRowsPerPageChange={listado.cambiarLimite}
                 labelRowsPerPage="Filas por página"
               />
             </TableRow>

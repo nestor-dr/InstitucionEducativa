@@ -6,6 +6,7 @@ const Boletin = require('../schemas/boletin')
 const Usuario = require('../schemas/usuario')
 
 const permitirRoles = require('../middlewares/authorization')
+const { leerPaginacion, regexBusqueda, responderListado } = require('../utils/paginacion')
 
 const router = express.Router()
 
@@ -16,18 +17,26 @@ router.put('/:id', permitirRoles('admin'), actualizarAlumno)
 router.delete('/:id', permitirRoles('admin'), borrarAlumno)
 
 //Obtiene todos los alumnos existentes
+// Con ?pagina=1&limite=10&buscar=texto devuelve una pagina, buscando por nombre, apellido o legajo
 // Con ?sinUsuario=true trae solo los que todavia no tienen usuario (para vincular un usuario alumno)
 // y con &incluir=<id> suma ese alumno aunque ya tenga usuario (el vinculado al usuario que se edita)
 async function obtenerTodosAlumnos(req, res, next) {
   try {
+    const paginacion = leerPaginacion(req.query)
     const filtro = {}
+
     if (req.query.sinUsuario === 'true') {
       const vinculados = await Usuario.distinct('alumno', { alumno: { $ne: null } })
       filtro._id = { $nin: vinculados.filter((id) => String(id) !== req.query.incluir) }
     }
 
-    const alumnos = await Alumno.find(filtro).populate('curso').sort({ apellido: 1, nombre: 1 }).collation({ locale: 'es' })
-    res.send(alumnos)
+    if (paginacion.buscar) {
+      const texto = regexBusqueda(paginacion.buscar)
+      filtro.$or = [{ nombre: texto }, { apellido: texto }, { nroLegajo: texto }]
+    }
+
+    const consulta = Alumno.find(filtro).populate('curso').sort({ apellido: 1, nombre: 1, _id: 1 }).collation({ locale: 'es' })
+    await responderListado(res, Alumno, filtro, consulta, paginacion)
   } catch (err) {
     next(err)
   }

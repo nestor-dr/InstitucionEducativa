@@ -7,6 +7,7 @@ const Alumno = require('../schemas/alumno')
 const Boletin = require('../schemas/boletin')
 
 const permitirRoles = require('../middlewares/authorization')
+const { leerPaginacion, regexBusqueda, responderListado } = require('../utils/paginacion')
 
 const router = express.Router()
 
@@ -17,10 +18,14 @@ router.put('/:id', permitirRoles('admin'), actualizarCurso)
 router.delete('/:id', permitirRoles('admin'), borrarCurso)
 
 //Obtiene todos los cursos existentes
+// Con ?pagina=1&limite=10&buscar=texto devuelve una pagina, buscando por el nombre del curso
 async function obtenerTodosCursos(req, res, next) {
     try {
-      const cursos = await Curso.find().populate('materias').populate('anio')
-      res.send(cursos)
+      const paginacion = leerPaginacion(req.query)
+      const filtro = paginacion.buscar ? { nombre: regexBusqueda(paginacion.buscar) } : {}
+
+      const consulta = Curso.find(filtro).populate('materias').populate('anio').sort({ nombre: 1, _id: 1 })
+      await responderListado(res, Curso, filtro, consulta, paginacion)
     } catch (err) {
       next(err)
     }

@@ -19,12 +19,14 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { useTheme } from '@mui/material/styles';
 
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import {  Alert  } from 'antd';
 
 import alumnoService from '../../services/Alumno/alumnoapi';
 import CeldaTexto from '../../components/CeldaTexto';
+import CampoBusqueda from '../../components/CampoBusqueda';
+import useListadoPaginado from '../../hooks/useListadoPaginado';
 
 import miImagen from '../../images/Fondo1.jpg';
 
@@ -90,24 +92,11 @@ TablePaginationActions.propTypes = {
 };
 
 export default function ListadoAlumno() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [alumnos, setAlumnos] = useState([])
 
-  useEffect(() => {
-    alumnoService.obtenerAlumnos().then(res => {setAlumnos(res);}).catch((error) => {setAlumnos([]); setError(error.mensaje); setTimeout(() => setError(null), 2000);})
-  }, [])
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - alumnos.length) : 0;
-
-  const handleChangePage = (event, newPage) => { setPage(newPage); };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  // Busqueda y paginacion las hace el back: aca solo se pide la pagina que se ve
+  const listado = useListadoPaginado(alumnoService.obtenerAlumnosPaginado);
 
   const eliminarAlumno = async (alumno) => {
     try {
@@ -116,7 +105,8 @@ export default function ListadoAlumno() {
           console.log('Alumno eliminado exitosamente:', res);
           setSuccess('Alumno eliminado exitosamente.');
 
-          setAlumnos((prevAlumnos) => prevAlumnos.filter((a) => a.nroLegajo !== alumno.nroLegajo));
+          // Se vuelve a pedir la pagina para que el total y la paginacion queden bien
+          listado.recargar();
 
         })
         .catch((error) => {
@@ -142,15 +132,21 @@ export default function ListadoAlumno() {
         <Typography variant="h4" style={{ margin: '16px', padding: '20px'}}>
           Lista de Alumnos
         </Typography>
-        
-        {error && (
+
+        <CampoBusqueda
+          valor={listado.busqueda}
+          alCambiar={listado.setBusqueda}
+          placeholder="Buscar por nombre, apellido o legajo"
+        />
+
+        {(error || listado.error) && (
           <Alert
             message="Error"
-            description={error}
+            description={error || listado.error}
             type="error"
             showIcon
             closable
-            onClose={() => setError(null)}
+            onClose={() => { setError(null); listado.setError(null); }}
             style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
           />
         )}
@@ -180,9 +176,14 @@ export default function ListadoAlumno() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {(rowsPerPage > 0
-            ? alumnos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : alumnos).map((alumno) => (
+            {!listado.cargando && listado.datos.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  {listado.busqueda ? 'No hay alumnos que coincidan con la búsqueda.' : 'Todavía no hay alumnos cargados.'}
+                </TableCell>
+              </TableRow>
+            )}
+            {listado.datos.map((alumno) => (
               <TableRow key={alumno.nroLegajo}>
                 <CeldaTexto texto={alumno.nombre} style={{ textTransform: 'capitalize' }} />
                 <CeldaTexto texto={alumno.apellido} style={{ textTransform: 'capitalize' }} />
@@ -199,28 +200,23 @@ export default function ListadoAlumno() {
                 </TableCell>
               </TableRow>
             ))}
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={7} />
-              </TableRow>
-            )}
           </TableBody>
           <TableFooter>
             <TableRow>
               <TablePagination
-                rowsPerPageOptions={[5, 10, 25, { label: 'Todos', value: -1 }]}
+                rowsPerPageOptions={[5, 10, 25]}
                 colSpan={7}
-                count={alumnos.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
+                count={listado.total}
+                rowsPerPage={listado.limite}
+                page={listado.pagina}
                 SelectProps={{
                   inputProps: {
                     'aria-label': 'rows per page',
                   },
                   native: true,
                 }}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
+                onPageChange={listado.cambiarPagina}
+                onRowsPerPageChange={listado.cambiarLimite}
                 ActionsComponent={TablePaginationActions}
                 labelRowsPerPage="Filas por página"
               />

@@ -5,6 +5,7 @@ const Alumno = require('../schemas/alumno')
 const Curso = require('../schemas/curso')
 
 const permitirRoles = require('../middlewares/authorization')
+const { leerPaginacion, regexBusqueda, responderListado } = require('../utils/paginacion')
 
 const router = express.Router()
 
@@ -70,10 +71,25 @@ function validarNotas(notas, curso) {
 }
 
 //Obtiene todos los boletines existentes
+// Con ?pagina=1&limite=10&buscar=texto devuelve una pagina, buscando por el alumno
+// (nombre, apellido o legajo) o por el nombre del curso
 async function obtenerTodosBoletines(req, res, next) {
   try {
-    const boletines = await completarBoletin(Boletin.find().sort({ createdAt: -1 }))
-    res.send(boletines)
+    const paginacion = leerPaginacion(req.query)
+    const filtro = {}
+
+    if (paginacion.buscar) {
+      // El boletin guarda ids: primero se buscan los alumnos y cursos que coinciden
+      const texto = regexBusqueda(paginacion.buscar)
+      const [alumnos, cursos] = await Promise.all([
+        Alumno.find({ $or: [{ nombre: texto }, { apellido: texto }, { nroLegajo: texto }] }).distinct('_id'),
+        Curso.find({ nombre: texto }).distinct('_id'),
+      ])
+      filtro.$or = [{ alumno: { $in: alumnos } }, { curso: { $in: cursos } }]
+    }
+
+    const consulta = completarBoletin(Boletin.find(filtro).sort({ createdAt: -1, _id: 1 }))
+    await responderListado(res, Boletin, filtro, consulta, paginacion)
   } catch (err) {
     next(err)
   }

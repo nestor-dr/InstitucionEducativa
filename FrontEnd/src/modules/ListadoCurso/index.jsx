@@ -1,4 +1,3 @@
-import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -17,10 +16,12 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {  Alert  } from 'antd';
 import cursoService from '../../services/Curso/cursoapi';
 import CeldaTexto from '../../components/CeldaTexto';
+import CampoBusqueda from '../../components/CampoBusqueda';
+import useListadoPaginado from '../../hooks/useListadoPaginado';
 import Typography from '@mui/material/Typography';
 import miImagen from '../../images/Fondo1.jpg';
 import Button from '@mui/material/Button';
@@ -87,27 +88,11 @@ TablePaginationActions.propTypes = {
 };
 
 export default function ListadoCurso() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [cursos, setCursos] = useState([])
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  useEffect(() => {
-    cursoService.obtenerCursos().then(res => {setCursos(res);}).catch((error) => {setCursos([]); setError(error.mensaje); setTimeout(() => setError(null), 2000);})
-    }, [])
-
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - cursos.length) : 0;
-
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  // Busqueda y paginacion las hace el back: aca solo se pide la pagina que se ve
+  const listado = useListadoPaginado(cursoService.obtenerCursosPaginado);
 
   const eliminarCurso = async (curso) => {
     try {
@@ -117,7 +102,8 @@ export default function ListadoCurso() {
           console.log('Curso eliminado exitosamente:', res);
           setSuccess('Curso eliminado exitosamente.');
 
-          setCursos((prevCursos) => prevCursos.filter((a) => a._id !== curso._id));
+          // Se vuelve a pedir la pagina para que el total y la paginacion queden bien
+          listado.recargar();
 
         })
         .catch((error) => {
@@ -144,14 +130,19 @@ export default function ListadoCurso() {
       <Typography variant="h4" style={{ margin: '16px', padding: '20px'}}>
          Lista de Cursos
       </Typography>
-      {error && (
+      <CampoBusqueda
+        valor={listado.busqueda}
+        alCambiar={listado.setBusqueda}
+        placeholder="Buscar por nombre de curso (ej: 1.001)"
+      />
+      {(error || listado.error) && (
           <Alert
             message="Error"
-            description={error}
+            description={error || listado.error}
             type="error"
             showIcon
             closable
-            onClose={() => setError(null)}
+            onClose={() => { setError(null); listado.setError(null); }}
             style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
           />
         )}
@@ -177,10 +168,14 @@ export default function ListadoCurso() {
            </TableRow>
         </TableHead>
         <TableBody>
-          {(rowsPerPage > 0
-            ? cursos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : cursos
-          ).map((curso) => (
+          {!listado.cargando && listado.datos.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={4} align="center">
+                {listado.busqueda ? 'No hay cursos que coincidan con la búsqueda.' : 'Todavía no hay cursos cargados.'}
+              </TableCell>
+            </TableRow>
+          )}
+          {listado.datos.map((curso) => (
             <TableRow key={curso._id}>
               <CeldaTexto texto={curso.nombre} />
               {/* Las materias en una linea; si no entran, se ven todas al pasar el mouse */}
@@ -207,28 +202,23 @@ export default function ListadoCurso() {
               </TableCell>
             </TableRow>
           ))}
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={4} />
-            </TableRow>
-          )}
         </TableBody>
         <TableFooter>
           <TableRow>
             <TablePagination
-              rowsPerPageOptions={[5, 10, 25, { label: 'Todos', value: -1 }]}
+              rowsPerPageOptions={[5, 10, 25]}
               colSpan={4}
-              count={cursos.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
+              count={listado.total}
+              rowsPerPage={listado.limite}
+              page={listado.pagina}
               SelectProps={{
                 inputProps: {
                   'aria-label': 'rows per page',
                 },
                 native: true,
               }}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
+              onPageChange={listado.cambiarPagina}
+              onRowsPerPageChange={listado.cambiarLimite}
               ActionsComponent={TablePaginationActions}
               labelRowsPerPage="Filas por página"
             />

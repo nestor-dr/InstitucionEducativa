@@ -1,4 +1,3 @@
-import * as React from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -21,12 +20,14 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Alert, Popconfirm } from 'antd';
 
 import boletinService from '../../services/Boletin/boletinapi';
 import CeldaTexto from '../../components/CeldaTexto';
+import CampoBusqueda from '../../components/CampoBusqueda';
+import useListadoPaginado from '../../hooks/useListadoPaginado';
 import miImagen from '../../images/Fondo1.jpg';
 
 function TablePaginationActions(props) {
@@ -74,37 +75,19 @@ const estiloBoton = (color) => ({
 });
 
 export default function ListadoBoletines() {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [boletines, setBoletines] = useState([]);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    boletinService.obtenerBoletines()
-      .then((res) => setBoletines(res))
-      .catch((error) => {
-        setBoletines([]);
-        setError(error.mensaje);
-        setTimeout(() => setError(null), 2000);
-      });
-  }, []);
-
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - boletines.length) : 0;
-
-  const handleChangePage = (event, newPage) => { setPage(newPage); };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  // Busqueda y paginacion las hace el back: aca solo se pide la pagina que se ve
+  const listado = useListadoPaginado(boletinService.obtenerBoletinesPaginado);
 
   const eliminarBoletin = async (boletin) => {
     try {
       await boletinService.eliminarBoletin(boletin._id);
       setSuccess('Boletín eliminado exitosamente.');
-      setBoletines((prev) => prev.filter((b) => b._id !== boletin._id));
+      // Se vuelve a pedir la pagina para que el total y la paginacion queden bien
+      listado.recargar();
     } catch (error) {
       console.error('Error al eliminar boletín:', error);
       setError(error.mensaje);
@@ -126,14 +109,20 @@ export default function ListadoBoletines() {
         Lista de Boletines
       </Typography>
 
-      {error && (
+      <CampoBusqueda
+        valor={listado.busqueda}
+        alCambiar={listado.setBusqueda}
+        placeholder="Buscar por alumno, legajo o curso"
+      />
+
+      {(error || listado.error) && (
         <Alert
           message="Error"
-          description={error}
+          description={error || listado.error}
           type="error"
           showIcon
           closable
-          onClose={() => setError(null)}
+          onClose={() => { setError(null); listado.setError(null); }}
           style={{ position: 'fixed', bottom: 20, right: 20, zIndex: 2000 }}
         />
       )}
@@ -162,15 +151,14 @@ export default function ListadoBoletines() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {boletines.length === 0 && (
+            {!listado.cargando && listado.datos.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} align="center">Todavía no hay boletines cargados.</TableCell>
+                <TableCell colSpan={6} align="center">
+                  {listado.busqueda ? 'No hay boletines que coincidan con la búsqueda.' : 'Todavía no hay boletines cargados.'}
+                </TableCell>
               </TableRow>
             )}
-            {(rowsPerPage > 0
-              ? boletines.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : boletines
-            ).map((boletin) => (
+            {listado.datos.map((boletin) => (
               <TableRow key={boletin._id}>
                 <CeldaTexto
                   texto={boletin.alumno ? `${boletin.alumno.apellido}, ${boletin.alumno.nombre}` : 'Alumno no encontrado'}
@@ -209,23 +197,18 @@ export default function ListadoBoletines() {
                 </TableCell>
               </TableRow>
             ))}
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
-              </TableRow>
-            )}
           </TableBody>
           <TableFooter>
             <TableRow>
               <TablePagination
-                rowsPerPageOptions={[5, 10, 25, { label: 'Todos', value: -1 }]}
+                rowsPerPageOptions={[5, 10, 25]}
                 colSpan={6}
-                count={boletines.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
+                count={listado.total}
+                rowsPerPage={listado.limite}
+                page={listado.pagina}
                 SelectProps={{ inputProps: { 'aria-label': 'rows per page' }, native: true }}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
+                onPageChange={listado.cambiarPagina}
+                onRowsPerPageChange={listado.cambiarLimite}
                 ActionsComponent={TablePaginationActions}
                 labelRowsPerPage="Filas por página"
               />
