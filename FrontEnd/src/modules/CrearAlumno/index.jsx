@@ -17,7 +17,7 @@ export default function CrearAlumno() {
 
     useEffect(() => {
         const selectCursos = async () => {
-            cursoService.obtenerCursos().then(res => {setCursos(res);}); 
+            cursoService.obtenerCursos().then(res => {setCursos(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);}); 
         };
         selectCursos();
     }, []);
@@ -35,7 +35,7 @@ export default function CrearAlumno() {
         }, 2000);
         }).catch((error) => {
             console.error('Error al crear alumno:', error);
-            setError('Error al crear el Alumno. Nro de Legajo existente');
+            setError(error.mensaje);
 
             setTimeout(() => {
                 setError(null);

@@ -22,14 +22,14 @@ export default function CrearAlumno() {
 
     useEffect(() => {
         const selectMaterias = async () => {
-            materiaService.obtenerMaterias().then(res => {setMaterias(res);}); 
+            materiaService.obtenerMaterias().then(res => {setMaterias(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);}); 
         };      
         selectMaterias();
     }, []);
 
     useEffect(() => {
         const selectAnios = async () => {
-            anioService.obtenerAnios().then(res => {setAnios(res);}); 
+            anioService.obtenerAnios().then(res => {setAnios(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);}); 
         };
         selectAnios();
     }, []);
@@ -56,7 +56,7 @@ export default function CrearAlumno() {
 
             console.error('Error al crear Curso:', error);
 
-            setError('Error al crear el Curso. No se pudo crear el curso');
+            setError(error.mensaje);
             setTimeout(() => {
                 setError(null);
             }, 2000);

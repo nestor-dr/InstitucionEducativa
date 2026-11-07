@@ -29,14 +29,14 @@ async function obtenerTodosCursos(req, res, next) {
 async function obtenerCursoPorId(req, res, next) {
   
     if (!req.params.id) {
-      res.status(500).send('El parametro Id no esta definido')
+      return res.status(400).send('El parametro Id no esta definido')
     }
   
     try {
       const curso = await Curso.findById(req.params.id).populate('materias').populate('anio')
   
       if (!curso || curso.length == 0) {
-        res.status(404).send('curso no encontrado')
+        return res.status(404).send('curso no encontrado')
       }
   
       res.send(curso)
@@ -52,7 +52,11 @@ async function crearCurso(req, res, next) {
 
     try {
       const anio = (curso.anio == null) ? '' : await Anio.findOne({ _id: curso.anio });
-  
+
+      if (anio === null) {
+        return res.status(400).send('El año indicado no existe')
+      }
+
       const materias = (curso.materias == null) ? '' : await Materia.find({ _id: { $in: curso.materias } });
     
       const cursoCreado = await Curso.create({...curso, anio: anio._id, ...(materias !== '') && { materias: materias.map((materia) => materia._id) }});   
@@ -93,14 +97,14 @@ async function actualizarCurso(req, res, next) {
 async function borrarCurso(req, res, next) {
     
     if (!req.params.id) {
-      res.status(500).send('El parametro Id no esta definido')
+      return res.status(400).send('El parametro Id no esta definido')
     }
   
     try {
       const curso = await Curso.findById(req.params.id)
   
       if (!curso) {
-        res.status(404).send('Curso no encontrado')
+        return res.status(404).send('Curso no encontrado')
       }
   
       await Curso.deleteOne({ _id: curso._id })

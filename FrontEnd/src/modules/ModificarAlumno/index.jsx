@@ -23,10 +23,10 @@ const ModificarAlumno = () => {
 
   const cargarDatosIniciales = async () => {
     // Obtener la lista de cursos
-        cursoService.obtenerCursos().then(res => {setCursos(res);});
+        cursoService.obtenerCursos().then(res => {setCursos(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);});
 
     // Obtener la lista de alumnos existentes
-        alumnoService.obtenerAlumnos().then(res => {setAlumnos(res);}); 
+        alumnoService.obtenerAlumnos().then(res => {setAlumnos(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);}); 
   };
 
   const obtenerDatosAlumno = (alumnoLegajo) => {
@@ -49,7 +49,8 @@ const ModificarAlumno = () => {
       })
       .catch((error) => {
         console.error('Error al obtener datos del alumno:', error);
-        // Manejar el error según sea necesario
+        setError(error.mensaje);
+        setTimeout(() => setError(null), 2000);
       });
   };
     
@@ -73,7 +74,7 @@ const ModificarAlumno = () => {
       })
       .catch((error) => {
         console.error('Error al modificar alumno:', error);
-        setError('Error al Modificar el Alumno.');
+        setError(error.mensaje);
       
             setTimeout(() => {
                 setError(null);

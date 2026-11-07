@@ -96,8 +96,7 @@ export default function ListadoCurso() {
   const [success, setSuccess] = useState(null);
 
   useEffect(() => {
-    cursoService.obtenerCursos().then(res => 
-        setCursos(res))
+    cursoService.obtenerCursos().then(res => {setCursos(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);})
     }, [])
 
   const emptyRows =
@@ -125,11 +124,11 @@ export default function ListadoCurso() {
         })
         .catch((error) => {
           console.error('Error al eliminar curso:', error);
-          setError('Error al eliminar el curso. Por favor, inténtalo de nuevo más tarde.');
+          setError(error.mensaje);
         });
     } catch (error) {
       console.error('Error al eliminar curso:', error);
-      setError('Error al eliminar el curso. Por favor, inténtalo de nuevo más tarde.');
+      setError(error.mensaje);
     } finally {
       setTimeout(() => {
         setError(null);

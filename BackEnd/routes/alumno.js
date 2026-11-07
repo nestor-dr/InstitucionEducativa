@@ -29,14 +29,14 @@ async function obtenerAlumnoPorId(req, res, next) {
   console.log('Obtener Alumno por Id: ', req.params.id)
 
   if (!req.params.id) {
-    res.status(500).send('El parametro Id no esta definido')
+    return res.status(400).send('El parametro Id no esta definido')
   }
 
   try {
     const alumno = await Alumno.findById(req.params.id).populate('curso')
 
     if (!alumno || alumno.length == 0) {
-      res.status(404).send('Alumno no encontrado')
+      return res.status(404).send('Alumno no encontrado')
     }
 
     res.send(alumno)
@@ -58,6 +58,10 @@ async function crearAlumno(req, res, next) {
 
     if (alumnoExistente) {
       return res.status(400).send('El número de legajo ya existe');
+    }
+
+    if (curso === null) {
+      return res.status(400).send('El curso indicado no existe');
     }
 
     const alumnoCreado = await Alumno.create({ ...alumno, curso: curso._id })
@@ -92,14 +96,14 @@ async function actualizarAlumno(req, res, next) {
 async function borrarAlumno(req, res, next) {
 
   if (!req.params.id) {
-    res.status(500).send('El parametro Id no esta definido');
+    return res.status(400).send('El parametro Id no esta definido');
   }
 
   try {
     const alumno = await Alumno.findById(req.params.id);
     
     if (!alumno) {
-      res.status(404).send('Alumno no encontrado');
+      return res.status(404).send('Alumno no encontrado');
     }
 
     await Alumno.deleteOne({ _id: alumno._id });

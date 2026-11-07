@@ -22,14 +22,10 @@ export default function IngresarNotas() {
 
   useEffect(() => {
     // Obtener la lista de alumnos
-    alumnoService.obtenerAlumnos().then((res) => {
-      setAlumnos(res);
-    });
+    alumnoService.obtenerAlumnos().then(res => {setAlumnos(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);});
 
     // Obtener la lista de cursos
-    cursoService.obtenerCursos().then((res) => {
-      setCursos(res);
-    });
+    cursoService.obtenerCursos().then(res => {setCursos(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);});
   }, []);
 
   const handleAlumnoChange = (alumnoId) => {
@@ -69,7 +65,7 @@ export default function IngresarNotas() {
     })
     .catch((error) => {
       console.error('Error al crear boletín:', error);
-      setError('Error al crear el Boletín. Asegúrate de que no exista un boletín para este alumno y curso.');
+      setError(error.mensaje);
 
       setTimeout(() => {
         setError(null);

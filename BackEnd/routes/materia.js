@@ -22,14 +22,14 @@ async function obtenerTodosMaterias(req, res, next) {
 async function obtenerMateriaPorId(req, res, next) {
   
     if (!req.params.id) {
-      res.status(500).send('El parametro Id no esta definido')
+      return res.status(400).send('El parametro Id no esta definido')
     }
   
     try {
       const materia = await Materia.findById(req.params.id)
   
       if (!materia || materia.length == 0) {
-        res.status(404).send('materia no encontrado')
+        return res.status(404).send('materia no encontrado')
       }
   
       res.send(materia)

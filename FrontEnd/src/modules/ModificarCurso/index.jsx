@@ -29,13 +29,13 @@ const ModificarAlumno = () => {
 
   const cargarDatosIniciales = async () => {
     // Obtener la lista de cursos
-        cursoService.obtenerCursos().then(res => {setCursos(res);});
+        cursoService.obtenerCursos().then(res => {setCursos(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);});
 
     // Obtener la lista de alumnos existentes
-        anioService.obtenerAnios().then(res => {setAnios(res);});
+        anioService.obtenerAnios().then(res => {setAnios(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);});
     
     // Obtener la lista de materias existentes
-        materiaService.obtenerMaterias().then(res => {setMaterias(res);});
+        materiaService.obtenerMaterias().then(res => {setMaterias(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);});
   };
 
   const obtenerDatosCurso = (cursoId) => {
@@ -58,7 +58,8 @@ const ModificarAlumno = () => {
       })
       .catch((error) => {
         console.error('Error al obtener datos del alumno:', error);
-        // Manejar el error según sea necesario
+        setError(error.mensaje);
+        setTimeout(() => setError(null), 2000);
       });
   };
     
@@ -84,7 +85,7 @@ const ModificarAlumno = () => {
       })
       .catch((error) => {
         console.error('Error al modificar Curso:', error);
-        setError('Error al Modificar el Curso.');
+        setError(error.mensaje);
       
             setTimeout(() => {
                 setError(null);

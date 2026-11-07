@@ -23,7 +23,7 @@ async function obtenerTodosAnios(req, res, next) {
 async function obtenerAnioPorId(req, res, next) {
   
     if (!req.params.id) {
-      res.status(500).send('El parametro Id no esta definido')
+      return res.status(400).send('El parametro Id no esta definido')
     }
   
     try {
@@ -31,7 +31,7 @@ async function obtenerAnioPorId(req, res, next) {
       const anio = await Anio.findById(req.params.id)
   
       if (!anio || anio.length == 0) {
-        res.status(404).send('Año no encontrado')
+        return res.status(404).send('Año no encontrado')
       }
   
       res.send(anio)

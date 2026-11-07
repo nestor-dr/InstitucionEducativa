@@ -95,7 +95,7 @@ export default function ListadoAlumno() {
   const [alumnos, setAlumnos] = useState([])
 
   useEffect(() => {
-    alumnoService.obtenerAlumnos().then(res => setAlumnos(res))
+    alumnoService.obtenerAlumnos().then(res => {setAlumnos(res);}).catch((error) => {setError(error.mensaje); setTimeout(() => setError(null), 2000);})
   }, [])
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - alumnos.length) : 0;
@@ -119,11 +119,11 @@ export default function ListadoAlumno() {
         })
         .catch((error) => {
           console.error('Error al eliminar alumno:', error);
-          setError('Error al eliminar el alumno. Por favor, inténtalo de nuevo más tarde.');
+          setError(error.mensaje);
         });
     } catch (error) {
       console.error('Error al eliminar alumno:', error);
-      setError('Error al eliminar el alumno. Por favor, inténtalo de nuevo más tarde.');
+      setError(error.mensaje);
     } finally {
       setTimeout(() => {
         setError(null);
