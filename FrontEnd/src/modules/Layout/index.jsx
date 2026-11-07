@@ -112,7 +112,8 @@ const App = () => {
 
   return (
     <Layout style={{ minHeight: '100vh', }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
+      {/* Ancho 250 (el default es 200) para que los textos de los submenus no salgan cortados */}
+      <Sider width={250} collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
         <div className="demo-logo-vertical" />
         <Menu theme="dark" selectedKeys={[location.pathname]} mode="inline" items={items} />
       </Sider>
