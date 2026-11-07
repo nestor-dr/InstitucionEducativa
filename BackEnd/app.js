@@ -40,15 +40,15 @@ app.get('/favicon.ico', (req, res) => res.status(204).end())
 app.use('/', statusRouter)
 app.use('/auth', authRouter)
 
-// Rutas que necesitan estar logueado (el control por rol esta en cada router)
+// Rutas que necesitan estar logueado (el control por rol de las escrituras esta en cada router)
 app.use('/usuarios', authentication, usuarioRouter)
-app.use('/alumnos', authentication, alumnoRouter)
-app.use('/cursos', authentication, cursoRouter)
-app.use('/anios', authentication, anioRouter)
-app.use('/materias', authentication, materiaRouter)
+app.use('/alumnos', authentication, permitirRoles('admin', 'profesor'), alumnoRouter)
+app.use('/cursos', authentication, permitirRoles('admin', 'profesor'), cursoRouter)
+app.use('/anios', authentication, permitirRoles('admin', 'profesor'), anioRouter)
+app.use('/materias', authentication, permitirRoles('admin', 'profesor'), materiaRouter)
 
-// Los boletines son solo del profesor
-app.use('/boletines', authentication, permitirRoles('profesor'), boletinRouter)
+// Boletines: el profesor los administra y el alumno solo ve el suyo (el detalle esta en el router)
+app.use('/boletines', authentication, permitirRoles('profesor', 'alumno'), boletinRouter)
 
 // Ruta inexistente
 app.use((req, res, next) => {

@@ -8,5 +8,6 @@ boletinService.actualizarBoletin = async (boletinId, notas) => {return await api
 boletinService.obtenerBoletines = async () => {return await api.get('/boletines')};
 boletinService.obtenerBoletin = async (boletinId) => {return await api.get(`/boletines/${boletinId}`)};
 boletinService.obtenerBoletinesDeAlumno = async (alumnoId) => {return await api.get(`/boletines/alumno/${alumnoId}`)};
+boletinService.obtenerMisBoletines = async () => {return await api.get('/boletines/mio')};
 
 export default boletinService

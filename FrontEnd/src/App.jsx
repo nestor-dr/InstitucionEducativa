@@ -22,6 +22,7 @@ import CrearBoletin from './modules/CrearBoletin'
 import ListadoBoletines from './modules/ListadoBoletines'
 import EditarBoletin from './modules/EditarBoletin'
 import VerBoletin from './modules/VerBoletin'
+import MiBoletin from './modules/MiBoletin'
 
 function App() {
 
@@ -66,6 +67,10 @@ function App() {
                   <Route path="Ver/:id" element={<VerBoletin />} />
                   <Route path="Editar/:id" element={<EditarBoletin />} />
                 </Route>
+              </Route>
+              {/* Solo alumno */}
+              <Route element={<RutaProtegida roles={['alumno']} />}>
+                <Route path="MiBoletin" element={<MiBoletin />} />
               </Route>
             </Route>
           </Route>

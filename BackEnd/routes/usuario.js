@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 
 const Usuario = require('../schemas/usuario')
 const Rol = require('../schemas/rol')
+const Alumno = require('../schemas/alumno')
 const permitirRoles = require('../middlewares/authorization')
 
 const router = express.Router()
@@ -57,6 +58,7 @@ async function obtenerUsuarioPorId(req, res, next) {
 //   "apellido": "Usuario",
 //   "rol": "profesor"
 // }
+// Para un alumno: "rol": "alumno", "alumno": "<_id del alumno>"
 
 // Creamos un usuario a partir de los datos obtenidos
 async function crearUsuario(req, res, next) {
@@ -65,10 +67,20 @@ async function crearUsuario(req, res, next) {
   const usuario = req.body
 
   try {
-    // El rol llega por su descripcion (admin / profesor)
+    // El rol llega por su descripcion (admin / profesor / alumno)
     const rol = await Rol.findOne({ descripcion: usuario.rol })
     if (!rol) {
       return res.status(404).send('Rol no encontrado')
+    }
+
+    // Un usuario alumno tiene que estar vinculado a un alumno que exista
+    if (rol.descripcion === 'alumno') {
+      const alumno = usuario.alumno ? await Alumno.findById(usuario.alumno) : null
+      if (!alumno) {
+        return res.status(400).send('Para el rol alumno hay que indicar un alumno que exista')
+      }
+    } else {
+      delete usuario.alumno
     }
 
     const passEncrypted = await bcrypt.hash(usuario.password, 10)
@@ -89,10 +101,11 @@ async function actualizarUsuario(req, res, next) {
     return res.status(403).send('No tenés permiso para modificar este usuario')
   }
 
-  // El email no se puede cambiar y el rol solo lo cambia un admin
+  // El email no se puede cambiar; el rol y el alumno vinculado solo los cambia un admin
   delete req.body.email
   if (req.user.rol !== 'admin') {
     delete req.body.rol
+    delete req.body.alumno
   }
 
   try {

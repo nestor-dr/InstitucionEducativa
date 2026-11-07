@@ -4,14 +4,20 @@ const Boletin = require('../schemas/boletin')
 const Alumno = require('../schemas/alumno')
 const Curso = require('../schemas/curso')
 
+const permitirRoles = require('../middlewares/authorization')
+
 const router = express.Router()
 
-router.get('/', obtenerTodosBoletines)
-router.get('/alumno/:id', obtenerBoletinesDeAlumno)
-router.get('/:id', obtenerBoletinPorId)
-router.post('/', crearBoletin)
-router.put('/:id', actualizarBoletin)
-router.delete('/:id', borrarBoletin)
+// El alumno solo puede ver sus propios boletines
+router.get('/mio', permitirRoles('alumno'), obtenerMisBoletines)
+
+// Todo lo demas es del profesor
+router.get('/', permitirRoles('profesor'), obtenerTodosBoletines)
+router.get('/alumno/:id', permitirRoles('profesor'), obtenerBoletinesDeAlumno)
+router.get('/:id', permitirRoles('profesor'), obtenerBoletinPorId)
+router.post('/', permitirRoles('profesor'), crearBoletin)
+router.put('/:id', permitirRoles('profesor'), actualizarBoletin)
+router.delete('/:id', permitirRoles('profesor'), borrarBoletin)
 
 // Trae el boletin con el alumno, el curso (con año y materias) y el nombre de cada materia
 function completarBoletin(consulta) {
@@ -67,6 +73,21 @@ function validarNotas(notas, curso) {
 async function obtenerTodosBoletines(req, res, next) {
   try {
     const boletines = await completarBoletin(Boletin.find().sort({ createdAt: -1 }))
+    res.send(boletines)
+  } catch (err) {
+    next(err)
+  }
+}
+
+// Obtiene los boletines del alumno logueado
+// El alumno sale del token (no de la URL), asi nadie puede pedir el boletin de otro
+async function obtenerMisBoletines(req, res, next) {
+  if (!req.user.alumno) {
+    return res.status(400).send('Tu usuario no está vinculado a ningún alumno')
+  }
+
+  try {
+    const boletines = await completarBoletin(Boletin.find({ alumno: req.user.alumno }).sort({ createdAt: -1 }))
     res.send(boletines)
   } catch (err) {
     next(err)

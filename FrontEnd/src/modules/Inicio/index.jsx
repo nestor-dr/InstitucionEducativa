@@ -5,6 +5,7 @@ import miImagen from '../../images/Fondo 6.png';
 const descripcionPorRol = {
   admin: 'Desde el menú podés administrar alumnos, cursos, materias y años.',
   profesor: 'Desde el menú podés generar, ver, editar e imprimir los boletines de los alumnos.',
+  alumno: 'Desde el menú podés ver e imprimir tu boletín de calificaciones.',
 };
 
 function Inicio() {

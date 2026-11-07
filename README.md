@@ -4,7 +4,7 @@ TP final de Programación III: un sistema para una institución educativa hecho 
 
 # Descripción general del módulo
 
-El sistema tiene dos roles que se loguean, y cada uno ve un menú distinto.
+El sistema tiene tres roles que se loguean, y cada uno ve un menú distinto.
 
 **Administrador**
 - Da de alta, modifica, lista y elimina **alumnos**, y los asigna a un curso (comisión).
@@ -15,18 +15,22 @@ El sistema tiene dos roles que se loguean, y cada uno ve un menú distinto.
 - Genera el **boletín de calificaciones** de un alumno, cargando la nota (de 1 a 10) de cada materia del curso al que pertenece.
 - Ve el listado de boletines con el promedio de cada uno, puede abrir un boletín, imprimirlo, corregir las notas o eliminarlo.
 
-**Los dos** pueden ver y editar sus datos personales (nombre, apellido y contraseña).
+**Alumno**
+- Entra con su propio usuario y ve **solo su boletín** (sin poder editar nada), y lo puede imprimir.
+
+**Todos** pueden ver y editar sus datos personales (nombre, apellido y contraseña).
 
 Algunas reglas del sistema:
 - Un alumno tiene un solo boletín por curso, y el boletín lleva la nota de todas las materias de ese curso.
 - No se puede borrar un curso que tiene alumnos, ni un alumno que tiene boletines, ni una materia o año que se están usando. El sistema avisa qué hay que hacer antes.
 - Todas las rutas de la API, menos el login, piden token. Además, cada rol solo puede hacer lo suyo: si un profesor escribe a mano la URL de una pantalla del admin, vuelve al inicio.
+- El alumno ve su boletín porque el back saca de su token a qué alumno corresponde. Aunque le pegue a la API con otro id, no puede ver el boletín de nadie más.
 
 # Entidades y relaciones
 
 ```
- Rol ◄──── Usuario
- (admin / profesor)
+ Rol ◄──── Usuario ┄┄┄► Alumno   (solo si el rol es alumno)
+ (admin / profesor / alumno)
 
  Anio ◄──── Curso ────► Materia (varias)
               ▲
@@ -39,7 +43,7 @@ Algunas reglas del sistema:
               └── notas: [ { materia ──► Materia, nota: 1 a 10 } ]
 ```
 
-- **Usuario** → tiene un **Rol**.
+- **Usuario** → tiene un **Rol**. Si el rol es alumno, además apunta al **Alumno** que le corresponde.
 - **Curso** → pertenece a un **Anio** y tiene un array de **Materias**.
 - **Alumno** → está asignado a un **Curso**.
 - **Boletin** → es de un **Alumno** en un **Curso**, y tiene una nota por cada materia de ese curso. También guarda la fecha de creación, y el promedio se calcula al consultarlo.
@@ -71,7 +75,7 @@ npm run dev
 ```
 
 - `cp .env.example .env` crea tu archivo de configuración. En PowerShell es `Copy-Item .env.example .env`. Conviene cambiar `JWT_SECRET` por un texto largo cualquiera.
-- `npm run migrate-dev up` carga los datos iniciales (roles, usuarios, años, materias, cursos, alumnos y dos boletines de ejemplo). Para deshacerlas: `npm run migrate-dev down`, que deshace la última, así que se repite hasta vaciar. Para ver cuáles están aplicadas: `npm run migrate-dev status`.
+- `npm run migrate-dev up` carga los datos iniciales (roles, usuarios, años, materias, cursos, alumnos, dos boletines de ejemplo y un usuario alumno). Para deshacerlas: `npm run migrate-dev down`, que deshace la última, así que se repite hasta vaciar. Para ver cuáles están aplicadas: `npm run migrate-dev status`.
 - `npm run dev` levanta la API en `http://localhost:4000`.
 
 ### 2. Front
@@ -114,8 +118,9 @@ Los carga la migración inicial.
 | Administrador | `admin@baseapinode.com` | `Password1` |
 | Profesor | `glarriera@baseapinode.com` | `Password1` |
 | Profesor | `clopez@baseapinode.com` | `Password1` |
+| Alumno (Nestor del Rio) | `ndelrio@baseapinode.com` | `Password1` |
 
-Con el profesor ya hay dos boletines cargados (Nestor del Rio y Juan Perez). Maria, Pedro y Lucia todavía no tienen boletín, así que sirven para probar cómo se crea uno.
+Con el profesor ya hay dos boletines cargados (Nestor del Rio y Juan Perez). Maria, Pedro y Lucia todavía no tienen boletín, así que sirven para probar cómo se crea uno. El usuario alumno está vinculado a Nestor del Rio, así que al entrar ve su boletín.
 
 # Pantallas
 
@@ -132,6 +137,7 @@ Con el profesor ya hay dos boletines cargados (Nestor del Rio y Juan Perez). Mar
 | `/Boletines/Crear` | profesor | Generar el boletín de un alumno |
 | `/Boletines/Ver/:id` | profesor | Ver e imprimir un boletín |
 | `/Boletines/Editar/:id` | profesor | Corregir las notas de un boletín |
+| `/MiBoletin` | alumno | Ver e imprimir su propio boletín |
 
 # Logs y errores
 
@@ -154,7 +160,7 @@ BackEnd/
   utils/            Generación del token y logger
 FrontEnd/src/
   App.jsx           Rutas del front
-  components/       RutaProtegida (control de sesión y rol)
+  components/       RutaProtegida (control de sesión y rol) y HojaBoletin (la hoja del boletín)
   modules/          Una carpeta por pantalla
   services/         Llamadas a la API (axios), una carpeta por entidad
 ```

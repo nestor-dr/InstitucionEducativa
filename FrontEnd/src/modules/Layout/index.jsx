@@ -71,6 +71,14 @@ function armarMenu(rol) {
     ];
   }
 
+  if (rol === 'alumno') {
+    return [
+      inicio,
+      getItem(<Link to="/MiBoletin"> Mi Boletín </Link>, '/MiBoletin', <ReadOutlined />),
+      datosPersonales,
+    ];
+  }
+
   return [inicio, datosPersonales];
 }
 

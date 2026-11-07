@@ -11,7 +11,8 @@ const usuarioSchema = new Schema({
   apellido: { type: String, required: true, lowercase: true, trim: true},
   email:    { type: String, required: true, unique: true, lowercase: true, trim: true, validate: emailValidator},
   password: { type: String, required: true, select: false},
-  rol:      { type: ObjectId, ref: 'Roles', required: true}
+  rol:      { type: ObjectId, ref: 'Roles', required: true},
+  alumno:   { type: ObjectId, ref: 'Alumno' } // Solo para el rol alumno: a que alumno corresponde
 })
 
 usuarioSchema.method('checkPassword', async function checkPassword(potentialPassword) {

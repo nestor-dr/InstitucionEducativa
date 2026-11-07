@@ -28,3 +28,10 @@
     print-color-adjust: exact;
   }
 }
+
+/* Si se imprimen varios boletines (Mi Boletin), cada uno en su hoja */
+@media print {
+  .boletin-hoja + .boletin-hoja {
+    break-before: page;
+  }
+}

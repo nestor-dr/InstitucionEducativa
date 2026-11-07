@@ -3,6 +3,7 @@ const express = require('express')
 const Alumno = require('../schemas/alumno')
 const Curso = require('../schemas/curso')
 const Boletin = require('../schemas/boletin')
+const Usuario = require('../schemas/usuario')
 
 const permitirRoles = require('../middlewares/authorization')
 
@@ -127,6 +128,12 @@ async function borrarAlumno(req, res, next) {
     const cantidadBoletines = await Boletin.countDocuments({ alumno: alumno._id });
     if (cantidadBoletines > 0) {
       return res.status(400).send(`No se puede borrar: el alumno tiene ${cantidadBoletines} boletín(es). Eliminalos primero.`);
+    }
+
+    // Ni un alumno que tiene usuario para entrar al sistema
+    const cantidadUsuarios = await Usuario.countDocuments({ alumno: alumno._id });
+    if (cantidadUsuarios > 0) {
+      return res.status(400).send('No se puede borrar: el alumno tiene un usuario para entrar al sistema.');
     }
 
     await Alumno.deleteOne({ _id: alumno._id });

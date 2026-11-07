@@ -11,6 +11,11 @@ async function generateUserToken(req, usuario) {
     rol: rol.descripcion,
   }
 
+  // Si es un usuario alumno, el token lleva a que alumno corresponde (asi solo ve lo suyo)
+  if (usuario.alumno) {
+    payload.alumno = usuario.alumno
+  }
+
   const userResponse = {
     _id: usuario._id,
     rol: rol.descripcion,
