@@ -55,8 +55,8 @@ if(usuario && usuario.usuario && usuario.usuario.rol == 'admin'){
   items = [
     getItem(<Link to="/Inicio"> Inicio </Link>, '1', <HomeOutlined />),
     getItem('Boletines', '10', <ReadOutlined />, [
-      getItem(<Link to="/Boletines/Crear"> Generar Boletin </Link>, '11', <FileSearchOutlined />), 
-      getItem('Agregar Boletin', '12', <FileAddOutlined />),
+      getItem(<Link to="/Boletines/Listado"> Listado de Boletines </Link>, '11', <FileSearchOutlined />),
+      getItem(<Link to="/Boletines/Crear"> Generar Boletin </Link>, '12', <FileAddOutlined />),
     ]),
     getItem(<Link to="/DatosPersonales"> Datos Personales </Link>, '13', <HomeOutlined />),
   ];

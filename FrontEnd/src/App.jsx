@@ -14,6 +14,9 @@ import CrearCurso from './modules/CrearCurso'
 import ModificarCurso from './modules/ModificarCurso'
 
 import CrearBoletin from './modules/CrearBoletin'
+import ListadoBoletines from './modules/ListadoBoletines'
+import EditarBoletin from './modules/EditarBoletin'
+import VerBoletin from './modules/VerBoletin'
 
 function App() {
 
@@ -44,6 +47,9 @@ function App() {
               <Route element={<RutaProtegida roles={['profesor']} />}>
                 <Route path="Boletines">
                   <Route path="Crear" element={<CrearBoletin />} />
+                  <Route path="Listado" element={<ListadoBoletines />} />
+                  <Route path="Ver/:id" element={<VerBoletin />} />
+                  <Route path="Editar/:id" element={<EditarBoletin />} />
                 </Route>
               </Route>
             </Route>

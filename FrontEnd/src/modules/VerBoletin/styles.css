@@ -1,0 +1,30 @@
+/* Al imprimir se oculta todo lo que no es el boletin */
+@media print {
+  .ant-layout-sider,
+  .ant-layout-header,
+  .ant-layout-footer,
+  .ant-alert,
+  .no-imprimir {
+    display: none !important;
+  }
+
+  .ant-layout,
+  .ant-layout-content {
+    background: none !important;
+    margin: 0 !important;
+  }
+
+  .boletin-hoja {
+    box-shadow: none !important;
+    border: 1px solid #000 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .boletin-hoja th {
+    background-color: #ddd !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
